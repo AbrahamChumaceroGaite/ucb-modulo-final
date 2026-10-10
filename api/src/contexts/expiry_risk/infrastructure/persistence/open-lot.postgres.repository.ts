@@ -11,7 +11,7 @@ import { dayNumber } from '../../domain/services/iso-date';
  * `training/src/build_dataset.py` builds for every morning of the history:
  * the same movement kinds, the same lot content, the same balance and FEFO
  * queue, the same usage windows and the same 4-decimal rounding. The two are
- * written in different languages, so `test/open-lots.e2e-spec.ts` checks this
+ * written in different languages, so `test/database.db-spec.ts` checks this
  * class against the lots training exported for the snapshot date.
  */
 const USAGE = ['Consumo venta', 'Consumo produccion', 'Venta'];

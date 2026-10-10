@@ -5,7 +5,7 @@ import math
 import pandas as pd
 import pytest
 
-from build_dataset import classify_movements, morning_balances, review_rows, usage_averages
+from build_dataset import classify_movements, morning_balances, review_rows, reviews_until, usage_averages
 
 KINDS = {
     "k-open": "Apertura",
@@ -72,6 +72,32 @@ def test_usage_averages_look_only_at_yesterday_and_back():
     # Not enough history yet: missing, not zero.
     assert math.isnan(averages.loc[days[6], "usage_7d"])
     assert math.isnan(averages.loc[days[9], "usage_28d"])
+
+
+def test_open_lots_reviewed_the_morning_after_the_data_have_usage():
+    # Regression: the usage grid stopped at the last day of data, so on the
+    # morning after it every open lot came out without usage averages.
+    last_day = pd.Timestamp("2026-03-10")
+    lots = pd.DataFrame(
+        {
+            "lot_id": ["L1"],
+            "product_id": ["P1"],
+            "product": ["Leche"],
+            "family": ["dairy"],
+            "received_on": [pd.Timestamp("2026-03-01")],
+            "expires_on": [pd.Timestamp("2026-03-20")],
+            "content": [1000.0],
+            "expired": [float("nan")],
+        }
+    )
+    days = pd.date_range("2026-03-01", last_day)
+    moves = pd.DataFrame({"id_producto": "P1", "id_detalle_lote": "L1", "day": days, "usage": 7.0, "outflow": 7.0})
+
+    reviews, _ = reviews_until(lots, moves, last_day)
+    today = reviews[reviews["reviewed_on"] == "2026-03-11"].iloc[0]
+
+    assert today["remaining_quantity"] == pytest.approx(930.0)
+    assert today["usage_7d"] == pytest.approx(7.0)
 
 
 def test_morning_balance_subtracts_only_what_left_before_that_morning():

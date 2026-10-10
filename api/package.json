@@ -7,14 +7,15 @@
   "license": "MIT",
   "scripts": {
     "build": "nest build && tsc-alias -p tsconfig.build.json",
-    "start": "node dist/main.js",
-    "start:dev": "nest start --watch",
+    "start": "node --env-file-if-exists=.env dist/main.js",
+    "start:dev": "nest start --watch --exec \"node --env-file-if-exists=.env\"",
     "model:update": "node scripts/update-model.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint .",
     "test": "jest",
     "test:e2e": "jest --config test/jest-e2e.config.ts",
-    "check": "npm run typecheck && npm run lint && npm run test && npm run test:e2e"
+    "check": "npm run typecheck && npm run lint && npm run test && npm run test:e2e",
+    "test:db": "node --env-file-if-exists=.env node_modules/jest/bin/jest.js --config test/jest-db.config.ts --runInBand"
   },
   "dependencies": {
     "@nestjs/common": "^11.2.7",
@@ -47,5 +48,8 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "~5.6",
     "typescript-eslint": "^8.71.1"
+  },
+  "engines": {
+    "node": ">=22.9"
   }
 }

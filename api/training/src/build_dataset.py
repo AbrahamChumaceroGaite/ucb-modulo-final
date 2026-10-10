@@ -194,7 +194,12 @@ def lot_table(t: dict[str, pd.DataFrame], catalog: pd.DataFrame, moves: pd.DataF
 
 
 def daily_usage(lots: pd.DataFrame, moves: pd.DataFrame, cut: pd.Timestamp) -> pd.DataFrame:
-    """Usage per product and day, with zeros on days nothing was used."""
+    """Usage per product and day, with zeros on days nothing was used.
+
+    The grid runs up to `cut`, the review morning after the last day of data.
+    Its own usage is unknown and never read (averages look at yesterday and
+    back), but without the row there is no average for that morning, and every
+    open lot would be exported without usage."""
     used = moves.groupby(["id_producto", "day"])["usage"].sum()
     frames = []
     for product_id, first_day in lots.groupby("product_id")["received_on"].min().items():
@@ -277,6 +282,16 @@ def review_rows(lots: pd.DataFrame, balances: pd.DataFrame, averages: pd.DataFra
     )
 
 
+def reviews_until(lots: pd.DataFrame, moves: pd.DataFrame, last_day: pd.Timestamp) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Review rows for every morning up to the one after `last_day`, and the daily usage behind them.
+
+    That last morning is "today" for the open lots: the API reviews them on it."""
+    cut = last_day + timedelta(days=1)
+    usage = daily_usage(lots, moves, cut)
+    balances = morning_balances(lots, moves, cut)
+    return review_rows(lots, balances, usage_averages(usage)), usage
+
+
 def content_units(t: dict[str, pd.DataFrame], catalog: pd.DataFrame) -> dict[str, str]:
     """Unit the content of each product is measured in (ml, g, und)."""
     containers = t["existencias"].merge(
@@ -299,19 +314,19 @@ def main(dump: Path) -> None:
     cut = last_day + timedelta(days=1)  # "today": the morning after the last recorded day
 
     lots = lot_table(t, catalog, moves, cut)
-    usage = daily_usage(lots, moves, last_day)
-    averages = usage_averages(usage)
-    balances = morning_balances(lots, moves, cut)
-    reviews = review_rows(lots, balances, averages)
+    reviews, usage = reviews_until(lots, moves, last_day)
 
     labelled = reviews[reviews["expired"].notna() & (pd.to_datetime(reviews["reviewed_on"]) <= last_day)]
     still_open = reviews[pd.to_datetime(reviews["reviewed_on"]) == cut]
 
-    labelled.to_csv(DATA / "reviews.csv", index=False)
+    # LF on every platform: pandas would write CRLF on Windows and the tracked files would churn.
+    csv = {"index": False, "lineterminator": "\n"}
+    labelled.to_csv(DATA / "reviews.csv", **csv)
     lots.assign(received_on=lots["received_on"].dt.date.astype(str), expires_on=lots["expires_on"].dt.date.astype(str)).to_csv(
-        DATA / "lots.csv", index=False
+        DATA / "lots.csv", **csv
     )
-    usage.assign(day=usage["day"].dt.date.astype(str)).to_csv(DATA / "daily_usage.csv", index=False)
+    recorded = usage[usage["day"] <= last_day]  # the cut morning has no usage of its own yet
+    recorded.assign(day=recorded["day"].dt.date.astype(str)).to_csv(DATA / "daily_usage.csv", **csv)
     catalog.to_json(DATA / "catalog.json", orient="records", force_ascii=False, indent=2)
     still_open.drop(columns=["expired"]).to_json(DATA / "open_lots.json", orient="records", force_ascii=False, indent=2)
 

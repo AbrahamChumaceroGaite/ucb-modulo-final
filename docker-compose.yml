@@ -16,7 +16,10 @@ services:
       - ./api/database/seed-admin.sql:/docker-entrypoint-initdb.d/02-seed-admin.sql:ro
       - kaffehaus-ml-db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d kaffehausdb"]
+      # Por TCP a propósito: mientras restaura, Postgres corre un servidor
+      # temporal que solo escucha en el socket. Así «healthy» significa
+      # «restauración terminada», no «proceso vivo».
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d kaffehausdb"]
       interval: 5s
       retries: 30
 

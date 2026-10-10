@@ -10,8 +10,8 @@
     "initial_quantity":16.0,
     "remaining_quantity":15.0,
     "stock_ahead":0.0,
-    "usage_7d":null,
-    "usage_28d":null
+    "usage_7d":6.5714,
+    "usage_28d":7.6071
   },
   {
     "lot_id":"185ed37c-4dd2-4932-9017-8f6041acedcd",
@@ -24,8 +24,8 @@
     "initial_quantity":1000.0,
     "remaining_quantity":880.0,
     "stock_ahead":0.0,
-    "usage_7d":null,
-    "usage_28d":null
+    "usage_7d":245.7143,
+    "usage_28d":200.0
   },
   {
     "lot_id":"6fa0a102-3710-4e3e-b560-0e8d71deaf51",
@@ -38,8 +38,8 @@
     "initial_quantity":12.0,
     "remaining_quantity":7.0,
     "stock_ahead":0.0,
-    "usage_7d":null,
-    "usage_28d":null
+    "usage_7d":6.1429,
+    "usage_28d":5.7143
   },
   {
     "lot_id":"a67b8d05-f3c0-40a1-a2b9-a9a656f5ab02",
@@ -52,8 +52,8 @@
     "initial_quantity":48.0,
     "remaining_quantity":48.0,
     "stock_ahead":2.0,
-    "usage_7d":null,
-    "usage_28d":null
+    "usage_7d":8.4286,
+    "usage_28d":8.2857
   },
   {
     "lot_id":"da2707e4-fccf-40cd-aaec-de7f98254f6e",
@@ -66,8 +66,8 @@
     "initial_quantity":24.0,
     "remaining_quantity":2.0,
     "stock_ahead":0.0,
-    "usage_7d":null,
-    "usage_28d":null
+    "usage_7d":8.4286,
+    "usage_28d":8.2857
   },
   {
     "lot_id":"7b81f374-8c0a-4cf7-b99a-e9c9411cacce",
@@ -80,8 +80,8 @@
     "initial_quantity":30.0,
     "remaining_quantity":2.0,
     "stock_ahead":0.0,
-    "usage_7d":null,
-    "usage_28d":null
+    "usage_7d":2.8571,
+    "usage_28d":2.7857
   },
   {
     "lot_id":"2c9814f8-57f1-4107-bf50-e436a5fff7cf",
@@ -94,8 +94,8 @@
     "initial_quantity":2000.0,
     "remaining_quantity":1060.0,
     "stock_ahead":410.0,
-    "usage_7d":null,
-    "usage_28d":null
+    "usage_7d":348.5714,
+    "usage_28d":349.6429
   },
   {
     "lot_id":"7a722f30-be8e-4975-9bf7-431d69755c51",
@@ -108,8 +108,8 @@
     "initial_quantity":1000.0,
     "remaining_quantity":410.0,
     "stock_ahead":0.0,
-    "usage_7d":null,
-    "usage_28d":null
+    "usage_7d":348.5714,
+    "usage_28d":349.6429
   },
   {
     "lot_id":"d824cf67-ff69-40cc-a0cc-928984fe72ab",
@@ -122,8 +122,8 @@
     "initial_quantity":8000.0,
     "remaining_quantity":8000.0,
     "stock_ahead":0.0,
-    "usage_7d":null,
-    "usage_28d":null
+    "usage_7d":4548.4286,
+    "usage_28d":4123.9286
   },
   {
     "lot_id":"3cdfd1cd-873c-4859-bbe4-18131e7f989d",
@@ -136,8 +136,8 @@
     "initial_quantity":8000.0,
     "remaining_quantity":3461.0,
     "stock_ahead":0.0,
-    "usage_7d":null,
-    "usage_28d":null
+    "usage_7d":610.1429,
+    "usage_28d":1276.7857
   },
   {
     "lot_id":"30094fb5-ebc4-4493-b19a-66e70fae5721",
@@ -150,8 +150,8 @@
     "initial_quantity":40.0,
     "remaining_quantity":21.0,
     "stock_ahead":0.0,
-    "usage_7d":null,
-    "usage_28d":null
+    "usage_7d":13.7143,
+    "usage_28d":15.8571
   },
   {
     "lot_id":"6f121b7b-8948-40d4-99f6-3ecb3efa3a59",
@@ -164,8 +164,8 @@
     "initial_quantity":20.0,
     "remaining_quantity":20.0,
     "stock_ahead":21.0,
-    "usage_7d":null,
-    "usage_28d":null
+    "usage_7d":13.7143,
+    "usage_28d":15.8571
   },
   {
     "lot_id":"1c34178a-2eb5-4fcd-af83-24dc7a8fc3a8",
@@ -178,8 +178,8 @@
     "initial_quantity":1000.0,
     "remaining_quantity":540.0,
     "stock_ahead":0.0,
-    "usage_7d":null,
-    "usage_28d":null
+    "usage_7d":565.7143,
+    "usage_28d":580.7143
   },
   {
     "lot_id":"74140212-4fff-43af-a8a7-d90fb00d0a89",
@@ -192,8 +192,8 @@
     "initial_quantity":500.0,
     "remaining_quantity":500.0,
     "stock_ahead":540.0,
-    "usage_7d":null,
-    "usage_28d":null
+    "usage_7d":565.7143,
+    "usage_28d":580.7143
   },
   {
     "lot_id":"995c5a1c-d1e9-487c-a197-dfa9e2679297",
@@ -206,8 +206,8 @@
     "initial_quantity":2000.0,
     "remaining_quantity":960.0,
     "stock_ahead":0.0,
-    "usage_7d":null,
-    "usage_28d":null
+    "usage_7d":311.4286,
+    "usage_28d":327.8571
   },
   {
     "lot_id":"bb3c747a-3316-447a-a146-0b8199537fa8",
@@ -220,8 +220,8 @@
     "initial_quantity":1000.0,
     "remaining_quantity":1000.0,
     "stock_ahead":960.0,
-    "usage_7d":null,
-    "usage_28d":null
+    "usage_7d":311.4286,
+    "usage_28d":327.8571
   },
   {
     "lot_id":"6a70af44-0d3a-494e-b556-eceeddf55359",
@@ -234,7 +234,7 @@
     "initial_quantity":1000.0,
     "remaining_quantity":400.0,
     "stock_ahead":0.0,
-    "usage_7d":null,
-    "usage_28d":null
+    "usage_7d":142.8571,
+    "usage_28d":187.5
   }
 ]
