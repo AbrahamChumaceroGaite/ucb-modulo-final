@@ -8,6 +8,18 @@ Cada mañana el sistema revisa los lotes perecederos abiertos de la cafetería
 uno llegue a su fecha de vencimiento sin haberse terminado. Si la probabilidad
 supera el umbral, el lote se marca «usar primero».
 
+Esta es la rama **`api_kaffe`**: base de datos, API y modelo.
+
+## Ramas del repositorio
+
+| Rama | Contenido |
+|---|---|
+| `api_kaffe` | Base de datos (Docker), API NestJS y entrenamiento del modelo (`api/`, `docker-compose.yml`) |
+| `web_kaffe` | Frontend Next.js (`web/`) |
+
+Cada rama conserva su carpeta (`api/` o `web/`), así que las rutas de este
+README valen igual al clonar las dos ramas una junto a la otra.
+
 ## Planteamiento
 
 | Elemento | Decisión |
@@ -68,8 +80,7 @@ api/training (Python) ── entrena y exporta ──▶ api/model/
 |---|---|
 | `api/training/` | Construcción del dataset desde la copia de la base, entrenamiento, evaluación, figuras y exportación del modelo |
 | `api/` | API NestJS: inicio de sesión y riesgo de cada lote. Calcula las variables y ejecuta el modelo exportado; no entrena |
-| `web/` | Pantalla de lotes por vencer: lista con filtros, formulario para evaluar un lote, comparación con la línea base y límites del modelo |
-| `docs/` | Informe técnico, presentación y capturas |
+| `web/` (rama `web_kaffe`) | Pantalla de lotes por vencer: lista con filtros, formulario para evaluar un lote, comparación con la línea base y límites del modelo |
 
 Flujo de una consulta: la web pide `GET /lot-risk`; la API toma el último día
 con movimientos en la base, arma la revisión de la mañana siguiente para cada
@@ -106,7 +117,7 @@ hace falta para reentrenar.
 
    Queda en http://localhost:8082/api/v1/health.
 
-3. **Web**, en otra terminal:
+3. **Web** (rama `web_kaffe`), en otra terminal:
 
    ```powershell
    cd web
@@ -132,11 +143,11 @@ El modelo ya viene entrenado en `api/model/`. Para reentrenarlo, ver
 | `api/training` | `python -m pytest` | 27 pruebas: lectura del volcado, saldos por lote, consumo, calendario, variables y métricas |
 | `api` | `npm run check` | Tipos, reglas de capas, 73 pruebas unitarias (entre ellas, que variables y probabilidades coinciden con Python en 440 filas) y 18 pruebas HTTP |
 | `api` | `npm run test:db` | 6 pruebas contra la base restaurada: los 17 lotes abiertos y sus datos coinciden con los del entrenamiento, y el inicio de sesión funciona |
-| `web` | `npm run check` | Tipos, reglas de capas y 51 pruebas de la pantalla y sus reglas |
-| `web` | `npm run test:e2e` | 12 pruebas en el navegador con la API y la base reales |
+| `web` (rama `web_kaffe`) | `npm run check` | Tipos, reglas de capas y 51 pruebas de la pantalla y sus reglas |
+| `web` (rama `web_kaffe`) | `npm run test:e2e` | 12 pruebas en el navegador con la API y la base reales |
 
-Las pruebas pedidas por la rúbrica están en `web/e2e/expiry-risk.spec.ts` y en
-`api/test/app.e2e-spec.ts`:
+Las pruebas pedidas por la rúbrica están en `api/test/app.e2e-spec.ts` y en
+`web/e2e/expiry-risk.spec.ts` (rama `web_kaffe`):
 
 - **Caso válido**: un lote de la lista evaluado en el formulario da la misma
   probabilidad que la lista; leche que rota rápido no se marca.
@@ -169,8 +180,6 @@ Las pruebas pedidas por la rúbrica están en `web/e2e/expiry-risk.spec.ts` y en
 
 | Qué | Dónde |
 |---|---|
-| Informe técnico | [`docs/Informe_Tecnico_Kaffehaus.pdf`](docs/Informe_Tecnico_Kaffehaus.pdf) (y `.docx`) |
-| Presentación | [`docs/Presentacion_Kaffehaus.pptx`](docs/Presentacion_Kaffehaus.pptx) |
 | Código de entrenamiento | `api/training/src/` |
 | Modelo para inferencia | `api/model/risk_model.json` (árboles, umbral y métricas) y `api/training/artifacts/model_lightgbm.txt` (formato nativo de LightGBM) |
 | Resultados | `api/training/results/` y las figuras de `api/training/figures/` |
