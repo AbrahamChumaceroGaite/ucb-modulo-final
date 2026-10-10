@@ -1,0 +1,45 @@
+{
+  "name": "kaffehaus-ml-api",
+  "version": "1.0.0",
+  "description": "Servicio de predicción de riesgo de vencimiento de lotes para Kaffehaus",
+  "private": true,
+  "author": "Abraham Chumacero Gaite",
+  "license": "MIT",
+  "scripts": {
+    "build": "nest build && tsc-alias -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "start:dev": "nest start --watch",
+    "modelo:actualizar": "node scripts/copiar-modelo.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "jest",
+    "test:e2e": "jest --config test/jest-e2e.config.ts",
+    "check": "npm run typecheck && npm run test && npm run test:e2e"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.2.7",
+    "@nestjs/core": "^11.2.7",
+    "@nestjs/cqrs": "^11.0.3",
+    "@nestjs/platform-express": "^11.2.7",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "jsonwebtoken": "^9.0.3",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.24",
+    "@nestjs/testing": "^11.2.7",
+    "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^22.20.5",
+    "@types/supertest": "^7.2.1",
+    "jest": "^29.7.0",
+    "supertest": "^7.3.1",
+    "ts-jest": "^29.4.14",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.9.7",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "~5.6"
+  }
+}

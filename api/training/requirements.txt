@@ -1,0 +1,8 @@
+# Versiones con las que se generaron los artefactos de ml-api/modelo.
+# Con otras versiones el modelo puede cambiar; la prueba de paridad de ml-api lo detectaría.
+lightgbm==4.7.0
+scikit-learn==1.9.1
+pandas==3.0.5
+numpy==2.5.3
+scipy==1.18.1
+matplotlib==3.11.2
