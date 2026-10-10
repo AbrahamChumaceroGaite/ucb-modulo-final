@@ -1,19 +1,19 @@
 node_modules/
-.next/
-out/
-build/
 dist/
-
-# Entorno: NUNCA se commitean valores reales
-.env
-.env.*
-!.env.example
-
-*.log
-.DS_Store
-Thumbs.db
-*.tsbuildinfo
-next-env.d.ts
+.next/
 coverage/
-/test-results/
-/playwright-report/
+.env
+.env.local
+*.tsbuildinfo
+api/training/.venv/
+__pycache__/
+*.pyc
+test-results/
+playwright-report/
+api/training/data/raw/
+.pytest_cache/
+.ruff_cache/
+~$*
+# Archivos que genera `next dev` para asistentes de código
+AGENTS.md
+CLAUDE.md

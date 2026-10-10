@@ -1,1 +1,1 @@
-export { manejarLogout as POST } from '@/features/auth/server/auth.handlers';
+export { handleSignOut as POST } from '@/features/auth/server/auth.handlers';
