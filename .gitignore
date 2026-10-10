@@ -10,3 +10,4 @@ __pycache__/
 *.pyc
 test-results/
 playwright-report/
+api/training/data/raw/
