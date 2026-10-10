@@ -5,13 +5,8 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const DATE_MESSAGE = 'debe tener la forma AAAA-MM-DD';
 
 /**
- * Body of `POST /lot-risk/evaluate`: one lot typed by hand, to ask the model
- * "what if". Shape checks only (types, signs, formats). Rules that relate
- * fields to each other live in the domain value objects.
- *
- * `usage7d` is required here even though the domain accepts it missing: a
- * person filling the form knows last week's usage, and without it the
- * coverage rule cannot say anything to compare with.
+ * Body of `POST /lot-risk/evaluate`. Only types, signs and formats are checked
+ * here; rules between fields live in the domain value objects.
  */
 export class EvaluateLotDto {
   @IsUUID('all', { message: 'Elige un producto de la lista.' })

@@ -7,14 +7,7 @@ import { APP_CONFIG, type AppConfig } from '../config/app-config';
 import { IS_PUBLIC } from './public.decorator';
 import { TOKEN_ALGORITHM, type TokenClaims } from './token-claims';
 
-/**
- * Global guard: every route needs a valid access token unless it is marked
- * `@Public()`.
- *
- * The web never calls this API from the browser. Its BFF keeps the tokens in
- * httpOnly cookies and forwards `Authorization: Bearer`. Checking here anyway
- * means the API is not open to whoever can reach its port.
- */
+/** Every route needs a valid access token unless marked `@Public()`. */
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
@@ -39,14 +32,13 @@ export class JwtAuthGuard implements CanActivate {
       });
       if (!isAccessToken(claims)) throw new Error('wrong token type');
     } catch {
-      // No hint about which check failed.
       throw DomainException.unauthorized('El token no es válido o ha expirado.');
     }
     return true;
   }
 }
 
-/** A refresh token must not open the API: only `type: "access"` with a subject. */
+/** Only access tokens with a subject are accepted; a refresh token is rejected. */
 function isAccessToken(claims: unknown): claims is TokenClaims {
   if (typeof claims !== 'object' || claims === null) return false;
   const { type, sub } = claims as Record<string, unknown>;

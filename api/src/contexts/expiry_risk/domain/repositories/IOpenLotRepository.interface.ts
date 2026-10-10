@@ -9,12 +9,8 @@ export interface OpenLot extends LotReviewData {
 }
 
 /**
- * The inventory the risk is computed for.
- *
- * `latestDataDay` is the last day with recorded movements. Reviews happen the
- * morning after it: on a live database that is today, on a snapshot it is the
- * day after the snapshot was taken. Reviewing at the wall-clock date instead
- * would read every day since the snapshot as zero usage.
+ * Open lots read from the inventory. They are reviewed the morning after
+ * `latestDataDay`: today on a live database, the day after a snapshot.
  */
 export interface IOpenLotRepository {
   latestDataDay(): Promise<string | null>;

@@ -18,7 +18,6 @@ async function bootstrap(): Promise<void> {
 }
 
 bootstrap().catch((error: unknown) => {
-  // Without the model, the secret or the database URL the API must not pretend to work.
   console.error('No se pudo iniciar la API:', error instanceof Error ? error.message : error);
   process.exit(1);
 });

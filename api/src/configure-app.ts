@@ -2,10 +2,7 @@ import { ValidationPipe, type INestApplication, type ValidationError } from '@ne
 import { DomainException } from '@libs/domain';
 import { HttpExceptionFilter, type AppConfig } from '@libs/infrastructure';
 
-/**
- * Everything `main.ts` sets on the app, in one place, so the end-to-end tests
- * boot exactly the same app and not a look-alike.
- */
+/** Global prefix, error filter, validation and CORS. Shared by `main.ts` and the HTTP tests. */
 export function configureApp(app: INestApplication, config: AppConfig): void {
   app.setGlobalPrefix(config.prefix);
   app.useGlobalFilters(new HttpExceptionFilter());
@@ -21,18 +18,10 @@ export function configureApp(app: INestApplication, config: AppConfig): void {
   app.enableShutdownHooks();
 }
 
-/**
- * A wrong type explains itself better than the rules it also breaks: "mucho"
- * is not a negative number, it is not a number. class-validator reports
- * constraints in decorator order, so the type check is picked explicitly.
- */
+/** A type error is reported before other rules on the same field ("abc" is not a number, not a negative one). */
 const TYPE_CONSTRAINTS = ['isNumber', 'isInt', 'isString'];
 
-/**
- * The first broken rule, in Spanish. The web shows one line per error, and
- * class-validator's message for an unknown field is English
- * ("property x should not exist").
- */
+/** First broken rule as one Spanish message; class-validator's English unknown-field message is replaced. */
 function firstMessage(errors: ValidationError[]): string {
   const [error] = errors;
   if (!error) return 'La solicitud no es válida.';

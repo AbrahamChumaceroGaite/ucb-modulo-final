@@ -12,13 +12,9 @@ import { realRiskModel } from '../src/contexts/expiry_risk/testing/model-files';
 import { APP_CONFIG, readConfig } from '../src/libs/infrastructure';
 
 /**
- * The real thing: the restored Kaffehaus database, no fakes.
- *
- * The Postgres repository rebuilds in SQL and TypeScript what
- * `training/src/build_dataset.py` builds in pandas. If the two disagreed, the
- * API would feed the model inputs it never saw in training. The check is the
- * snapshot morning (2026-10-04): the API must find exactly the open lots
- * training exported, with the same numbers.
+ * Against the restored database, nothing replaced. On the snapshot morning
+ * (2026-10-04) the API must find the same open lots, with the same inputs,
+ * that training exported to `open_lots.json`.
  */
 interface TrainingOpenLot {
   lot_id: string;

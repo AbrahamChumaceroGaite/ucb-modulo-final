@@ -1,8 +1,4 @@
-/**
- * An account that can sign in, as the cafeteria database stores it: the
- * `usuario` row with its person's name and its role. Read-only here; this
- * API does not create or edit accounts.
- */
+/** A `usuario` row with its person's name and role. This API only reads accounts. */
 export interface UserAccount {
   id: string;
   email: string;

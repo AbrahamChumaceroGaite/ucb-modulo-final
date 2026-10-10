@@ -5,13 +5,7 @@ interface Usage {
   average28d: number | null;
 }
 
-/**
- * Average daily usage of the product over the last 7 and 28 days.
- *
- * Either can be missing: a product in its first weeks has no full window
- * yet, and the model was trained with those gaps. What cannot happen is a
- * negative average.
- */
+/** Average daily usage over the last 7 and 28 days; missing in a product's first weeks, never negative. */
 export class RecentUsage extends ValueObjectBase<Usage> {
   private constructor(value: Usage) {
     super(value);

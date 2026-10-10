@@ -5,12 +5,8 @@ import type { UserAccount } from '../../domain/entities/user-account.entity';
 import type { ITokenService, SessionTokens } from '../../domain/services/ITokenService.interface';
 
 /**
- * Signs the session tokens with the same claims the global guard checks.
- *
- * Stateless on purpose: there is no session table to keep in step. The cost
- * is that signing out only deletes the cookies; a stolen refresh token stays
- * valid until it expires (7 days by default). That trade-off is written in
- * the README.
+ * Signs access (15 min) and refresh (7 days) tokens with HS256. Stateless: there
+ * is no session table, so a refresh token cannot be revoked before it expires.
  */
 @Injectable()
 export class JwtTokenService implements ITokenService {

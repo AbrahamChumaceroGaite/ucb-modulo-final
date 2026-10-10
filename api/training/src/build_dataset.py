@@ -44,16 +44,14 @@ DEFAULT_DUMP = DATA / "raw" / "backup.sql"
 # the next product, butter, 46.
 PERISHABLE_MAX_DAYS = 30
 
-# Same tolerance as the original problem statement: leftovers under 2 % of
-# the lot are a rounding scrap, not waste worth a warning.
+# Leftovers under 2 % of the lot are a rounding scrap, not waste.
 EXPIRED_TOLERANCE = 0.02
 
 # Balances below this are treated as an empty lot (float noise from sums).
 EMPTY = 1e-6
 
-# The category column in the database is too coarse (almost every perishable
-# is "Insumos"), so each perishable product is assigned to a family by hand.
-# The build fails if a perishable product is missing here.
+# The database category is too coarse (almost every perishable is "Insumos"),
+# so each perishable product is given a family here. The build fails if one is missing.
 FAMILY_BY_PRODUCT = {
     "Leche Pil 1 L": "dairy",
     "Leche Prolac 1 L": "dairy",
@@ -167,8 +165,7 @@ def lot_table(t: dict[str, pd.DataFrame], catalog: pd.DataFrame, moves: pd.DataF
     lines["expires_on"] = pd.to_datetime(lines["fecha_vencimiento"])
 
     expired_moves = moves[moves["true_expiry"]].groupby("id_detalle_lote")["cantidad"].sum()
-    # Units never opened before expiry leave no movement. Only two lots in
-    # the whole history, but they are waste all the same.
+    # Units never opened before expiry leave no movement but are waste too.
     unopened = np.where(produced.loc[lines.index], 0.0, lines["cantidad_restante"] * lines["id_producto"].map(unit_content))
     lines["expired_quantity"] = lines["id"].map(expired_moves).fillna(0.0) + np.where(lines["expires_on"] < cut, unopened, 0.0)
     lines["expired"] = (lines["expired_quantity"] > EXPIRED_TOLERANCE * lines["content"]).astype(int)

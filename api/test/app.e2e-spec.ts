@@ -12,12 +12,8 @@ import { APP_CONFIG, PG_POOL } from '../src/libs/infrastructure';
 import { testConfig } from '../src/libs/testing/test-config';
 
 /**
- * The whole flow over HTTP, with the app `main.ts` boots: global guard,
- * validation pipe, error filter, CQRS buses and the real model files.
- *
- * Only the two database ports are swapped for in-memory fakes, so the suite
- * runs without PostgreSQL. The SQL behind them is checked separately against
- * the restored database (see README, "Prueba de integración").
+ * Full HTTP flow with the real app and model. Only the two database ports are
+ * in-memory fakes; `database.db-spec.ts` covers the SQL against PostgreSQL.
  */
 describe('API /api/v1', () => {
   let app: INestApplication;

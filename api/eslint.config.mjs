@@ -2,17 +2,12 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
 /**
- * Layer rules, checked by the linter instead of by discipline.
- *
- * domain ← application ← infrastructure / presentation. The domain knows
- * nothing about Nest, Postgres or tokens; the application talks to ports and
- * may log, nothing else from infrastructure; and the two contexts never
- * import each other (they only share `src/libs`).
- *
- * Flat config keeps only the last `no-restricted-imports` that matches a file,
- * so each (context, layer) pair gets one rule with every pattern it needs.
- * Specs are left out: a handler test may wire the real hasher next to a fake
- * repository, which is assembly, not a dependency of the layer.
+ * Layer rules: domain ← application ← infrastructure / presentation.
+ * - domain: no Nest, pg, jsonwebtoken or outer layers.
+ * - application: ports only; the logger is the one infrastructure import allowed.
+ * - the two contexts never import each other; they share `src/libs`.
+ * Flat config keeps only the last matching `no-restricted-imports`, so each
+ * (context, layer) pair gets one rule. Spec files are not checked.
  */
 const SPECS = ['**/*.spec.ts'];
 const CONTEXTS = ['auth', 'expiry_risk'];
@@ -28,8 +23,7 @@ const FORBIDDEN = {
 
 const MESSAGE = 'Esta capa no puede depender de ese módulo.';
 
-// Logging is the one infrastructure piece a handler may use. A regex, because
-// .gitignore patterns cannot re-include a file inside an excluded folder.
+// A regex because glob patterns cannot re-include a file inside an excluded folder.
 const APPLICATION_INFRASTRUCTURE = { regex: String.raw`^(?!@libs/infrastructure/monitoring/logger\.service$).*infrastructure`, message: MESSAGE };
 
 const restrict = (group, extra = []) => ({

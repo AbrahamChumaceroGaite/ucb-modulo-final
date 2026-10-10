@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 
-/** List parameters: `skip` and `limit`, not `page`. The web derives the page number. */
+/** List parameters: `skip`, `limit` and `search`. */
 export class PaginationDto {
   @IsOptional()
   @Type(() => Number)

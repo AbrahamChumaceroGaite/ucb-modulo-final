@@ -5,14 +5,10 @@ import type { IOpenLotRepository, OpenLot } from '../../domain/repositories/IOpe
 import { dayNumber } from '../../domain/services/iso-date';
 
 /**
- * Reads the open perishable lots straight from the cafeteria database.
- *
- * It rebuilds, for one morning, the same raw inputs that
- * `training/src/build_dataset.py` builds for every morning of the history:
- * the same movement kinds, the same lot content, the same balance and FEFO
- * queue, the same usage windows and the same 4-decimal rounding. The two are
- * written in different languages, so `test/database.db-spec.ts` checks this
- * class against the lots training exported for the snapshot date.
+ * Open perishable lots from the cafeteria database, with the same inputs
+ * `training/src/build_dataset.py` builds: lot content, balance on the review
+ * morning, FEFO queue and 7/28-day usage. `test/database.db-spec.ts` checks
+ * that both give the same values.
  */
 const USAGE = ['Consumo venta', 'Consumo produccion', 'Venta'];
 const WASTE = ['Merma', 'Ajuste negativo'];

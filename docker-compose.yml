@@ -6,6 +6,9 @@
 services:
   db:
     image: postgres:16-alpine
+    # Small WAL for a small database. The default lets the log grow to 1 GB
+    # while the backup restores, and the Docker disk never gives that back.
+    command: postgres -c max_wal_size=64MB -c min_wal_size=32MB -c wal_level=minimal -c max_wal_senders=0
     environment:
       POSTGRES_PASSWORD: postgrespassword
       POSTGRES_DB: kaffehausdb

@@ -11,8 +11,8 @@ from sklearn.metrics import average_precision_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-# Small grid on purpose: 12 combinations, each with early stopping on
-# validation. A wider search on one validation year would mostly fit noise.
+# 12 combinations, each with early stopping on validation. A wider search on
+# one validation year would mostly fit noise.
 LIGHTGBM_GRID = [
     {"num_leaves": leaves, "learning_rate": rate, "min_child_samples": min_rows}
     for leaves in (7, 15, 31)

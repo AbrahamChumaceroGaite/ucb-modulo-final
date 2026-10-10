@@ -2,8 +2,7 @@ from datetime import date
 
 from calendar_bo import class_day_share, easter_sunday, holidays_of, is_class_day, is_holiday
 
-# The list the previous version of the calendar typed by hand. The rule has
-# to reproduce it exactly, or the change of method changed the data.
+# Official 2026 holidays; the rules must reproduce them exactly.
 HAND_WRITTEN_2026 = [
     "2026-01-01", "2026-01-22", "2026-02-16", "2026-02-17", "2026-04-03",
     "2026-04-15", "2026-05-01", "2026-06-04", "2026-06-21", "2026-08-06",

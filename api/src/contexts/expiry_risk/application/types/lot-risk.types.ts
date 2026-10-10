@@ -2,11 +2,10 @@ import type { Page } from '@libs/application';
 import type { Family } from '../../domain/services/features';
 import type { RiskLevel } from '../../domain/value_objects/risk-level.vo';
 
-/** The model card leaves the API as the domain defines it. */
 export type { ModelCard } from '../../domain/entities/risk-model.entity';
 
 export interface LotRiskResponse {
-  /** `null` for a lot typed by hand: it does not exist in the inventory. */
+  /** `null` for a lot typed in the form. */
   lotId: string | null;
   product: { id: string; name: string; family: Family; unit: string };
   receivedOn: string;

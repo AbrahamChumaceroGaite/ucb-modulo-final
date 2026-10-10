@@ -1,8 +1,7 @@
 """Read tables straight from a plain-text `pg_dump` file.
 
-Training reads the snapshot file instead of a live database on purpose: the
-dump is a fixed copy of the data, so the dataset can be rebuilt bit for bit
-from one file, and no database has to be running to retrain.
+Training reads the snapshot file, not a live database, so the dataset can be
+rebuilt identically from one file without a running database.
 
 A plain dump stores each table as `COPY public.<table> (<columns>) FROM stdin;`
 followed by tab-separated rows and a terminating `\\.` line. NULL is `\\N`.

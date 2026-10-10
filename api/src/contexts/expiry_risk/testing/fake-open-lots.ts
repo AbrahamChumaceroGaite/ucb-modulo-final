@@ -2,11 +2,7 @@ import type { IOpenLotRepository, OpenLot } from '../domain/repositories/IOpenLo
 import type { LotReviewData } from '../domain/value_objects/lot-review.vo';
 import { productNamed } from './model-files';
 
-/**
- * The inventory without a database: lots kept in memory, reviewed on
- * whatever morning the handler asks for. Records each call so tests can check
- * which morning and which products were requested.
- */
+/** In-memory inventory for tests; records which morning and products were requested. */
 export class FakeOpenLotRepository implements IOpenLotRepository {
   readonly requests: { reviewedOn: string; productIds: readonly string[] }[] = [];
 

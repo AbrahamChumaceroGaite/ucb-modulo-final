@@ -1,10 +1,9 @@
 """From the raw inputs of one lot review to the model features.
 
-The API receives exactly the fields of `LotReview` and must compute the same
-numbers. To guarantee it, the training set is built by calling
-`build_features` on raw rows, and a sample of rows with their expected
-features and probabilities is exported as a parity fixture for the TypeScript
-tests (`api/src/.../domain/services/features.ts`). Change one, change both.
+The API computes the same features in TypeScript
+(`api/src/contexts/expiry_risk/domain/services/features.ts`). Training builds
+them with `build_features` on raw rows and exports a sample with the expected
+values (`parity.json`) for the API tests. Change one, change both.
 """
 
 from __future__ import annotations

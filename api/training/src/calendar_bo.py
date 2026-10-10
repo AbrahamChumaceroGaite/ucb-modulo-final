@@ -1,17 +1,11 @@
 """Operational calendar known in advance: Bolivian holidays and university vacations.
 
-Single source of truth for the calendar. It is exported to
-`artifacts/calendar.json` and the NestJS API loads that same file, so the
-class-day features are computed from identical data in training and inference.
+Exported to `artifacts/calendar.json`; the API loads the same file, so the
+class-day features are computed from the same data in training and inference.
+Demand is not encoded here: the model learns it from the sales history.
 
-Only what a cafeteria manager knows beforehand belongs here. Demand itself is
-never encoded: the model has to learn it from the sales history.
-
-Holidays are computed by rule instead of being typed per year, because the
-history now spans 2021-2026 and a hand-written list is where a wrong date
-hides. Movable dates come from Easter. Following the previous version of this
-file, a holiday that falls on a Sunday is not moved to Monday; Sundays are
-never class days, so the only effect is a missing Monday off in a few years.
+Holidays are computed by rule for 2021-2030; movable ones come from Easter.
+A holiday on a Sunday is not moved to Monday.
 """
 
 from __future__ import annotations

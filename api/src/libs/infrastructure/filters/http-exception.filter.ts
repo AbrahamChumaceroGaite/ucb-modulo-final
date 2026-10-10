@@ -9,10 +9,7 @@ export interface ErrorBody {
   timestamp: string;
 }
 
-/**
- * Every error leaves with the same body: `{ status, error, message, timestamp }`.
- * The web shows `message` as it comes, so it is written in Spanish for a person.
- */
+/** Every error is sent as `{ status, error, message, timestamp }`, with the message in Spanish. */
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(HttpExceptionFilter.name);
@@ -20,17 +17,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const response = host.switchToHttp().getResponse<Response>();
     const body = toErrorBody(exception);
-    // The person gets a short message; the cause goes to the log, or nobody can find it.
+    // The user gets a short message; the cause goes to the log.
     if (body.status >= 500) this.logger.error(exception instanceof Error ? exception.stack : String(exception));
     response.status(body.status).json(body);
   }
 }
 
-/**
- * What `pg` raises when PostgreSQL is not there: a refused or timed-out
- * socket, a server still starting (57P03), or one that drops the connection,
- * which comes without a code.
- */
+/** `pg` errors meaning PostgreSQL is unreachable or still starting. */
 const DATABASE_DOWN_CODES = new Set(['ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT', '57P03']);
 
 function isDatabaseDown(exception: unknown): boolean {
@@ -75,7 +68,7 @@ function kindOf(status: number): ErrorBody['error'] {
   return 'HttpError';
 }
 
-/** Nest's own 404 ("Cannot GET /x") is in English and names internals; it is replaced. */
+/** Nest's English 404 message is replaced. */
 function messageOf(body: string | object, status: number): string {
   if (status === 404) return 'La ruta pedida no existe.';
   if (typeof body === 'string') return body;

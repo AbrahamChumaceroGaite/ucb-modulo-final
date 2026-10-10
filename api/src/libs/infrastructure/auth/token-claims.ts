@@ -1,8 +1,4 @@
-/**
- * The claims both sides agree on: the auth context signs tokens with them and
- * the global guard checks them. One definition, so a renamed claim cannot
- * leave every request rejected with no hint why.
- */
+/** Claims signed by the auth context and checked by the global guard. */
 export const TOKEN_ALGORITHM = 'HS256';
 
 export type TokenType = 'access' | 'refresh';

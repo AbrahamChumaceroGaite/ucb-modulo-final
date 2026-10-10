@@ -1,14 +1,11 @@
 import { ConsoleLogger, Injectable, Scope } from '@nestjs/common';
 
-/**
- * Logger with a per-class context. Transient scope, so each consumer gets its
- * own instance and contexts do not overwrite each other.
- */
+/** Logger with a per-class context (one instance per consumer). */
 @Injectable({ scope: Scope.TRANSIENT })
 export class LoggerService extends ConsoleLogger {
   constructor() {
     super();
-    // Tests print their own report; the service's log would bury it.
+    // Silent under Jest.
     if (process.env.NODE_ENV === 'test') this.setLogLevels([]);
   }
 

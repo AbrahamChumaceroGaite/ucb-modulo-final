@@ -16,13 +16,7 @@ export interface LotReviewData {
   usage28d: number | null;
 }
 
-/**
- * One lot on one morning, with every cross-field rule already checked.
- *
- * It is the only way into `RiskModel.predict`: nothing reaches the model that
- * it was not trained to see. A lot read from the database goes through the
- * same rules as one typed in a form.
- */
+/** One lot on one morning, validated. The only input `RiskModel.predict` accepts, from the database or the form. */
 export class LotReview extends ValueObjectBase<LotReviewInput & { product: CatalogProduct }> {
   private constructor(value: LotReviewInput & { product: CatalogProduct }) {
     super(value);

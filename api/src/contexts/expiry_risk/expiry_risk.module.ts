@@ -10,12 +10,7 @@ import { OpenLotPostgresRepository } from './infrastructure/persistence/open-lot
 import { LotRiskController } from './presentation/lot-risk.controller';
 import { RiskModelController } from './presentation/risk-model.controller';
 
-/**
- * Bounded context: expiry risk of perishable lots.
- *
- * Wiring as in the course examples: CQRS handlers and ports injected by
- * token, so tests swap the database for a fake without touching a handler.
- */
+/** Expiry risk of perishable lots. Ports are injected by token, so tests can swap the database for a fake. */
 @Module({
   imports: [CqrsModule],
   controllers: [LotRiskController, RiskModelController],

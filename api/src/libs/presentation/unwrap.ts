@@ -1,10 +1,6 @@
 import { DomainException } from '../domain/domain.exception';
 
-/**
- * Handlers return `T | DomainException`. The controller returns the bare DTO,
- * without an envelope; a business error is thrown here and the global filter
- * writes the error body.
- */
+/** Handlers return `T | DomainException`: the value goes out as is, the error is thrown to the global filter. */
 export function unwrap<T>(result: T | DomainException): T {
   if (DomainException.isDomainException(result)) throw result;
   return result;

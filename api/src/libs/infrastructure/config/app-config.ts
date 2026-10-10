@@ -1,11 +1,6 @@
 import { resolve } from 'node:path';
 
-/**
- * Environment, validated once at startup.
- *
- * A missing secret or database URL stops the service with the variable's
- * name, instead of turning every request into an opaque 500 later.
- */
+/** Environment variables, validated at startup: a missing value stops the API with its name. */
 export interface AppConfig {
   port: number;
   host: string;

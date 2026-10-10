@@ -68,10 +68,8 @@ def export_model(model: lgb.LGBMClassifier, threshold: float, target_recall: flo
 def export_parity(rows: pd.DataFrame, model: lgb.LGBMClassifier, seed: int) -> None:
     """Raw inputs, expected features and expected probability, for the API tests.
 
-    Parity is about computing the same thing, not about generalisation, so
-    rows come from every partition. Rows with missing usage (only at the
-    start of a product's history) are added on purpose: that is where a port
-    is most likely to diverge."""
+    Rows come from every partition and include rows with missing usage, the
+    case where the TypeScript port is most likely to differ."""
     sample = rows.sample(n=400, random_state=seed)
     missing = rows[rows["usage_28d"].isna() | rows["usage_7d"].isna()]
     sample = pd.concat([sample, missing.sample(n=min(40, len(missing)), random_state=seed)])

@@ -4,7 +4,7 @@ import { PaginationDto } from '@libs/application';
 import { FAMILIES, type Family } from '../../domain/services/features';
 import { RISK_LEVELS, type RiskLevel } from '../../domain/value_objects/risk-level.vo';
 
-/** `?level=high,watch` → `['high', 'watch']`, the way the web writes multi-value filters. */
+/** `?level=high,watch` → `['high', 'watch']`. */
 const commaList = ({ value }: { value: unknown }): string[] | undefined =>
   typeof value === 'string' && value.trim() !== ''
     ? value

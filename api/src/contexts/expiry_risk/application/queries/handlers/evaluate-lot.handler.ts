@@ -8,12 +8,7 @@ import { toLotRiskResponse } from '../../mappers/lot-risk.mapper';
 import type { LotRiskResponse } from '../../types/lot-risk.types';
 import { EvaluateLotQuery } from '../evaluate-lot.query';
 
-/**
- * Validates a lot typed by hand and runs the real model on it.
- *
- * Order matters: the product first (the model only knows the products it was
- * trained on), then the domain rules, then inference.
- */
+/** Flow: known product → domain rules (`LotReview`) → model prediction. */
 @QueryHandler(EvaluateLotQuery)
 export class EvaluateLotHandler implements IQueryHandler<EvaluateLotQuery> {
   constructor(

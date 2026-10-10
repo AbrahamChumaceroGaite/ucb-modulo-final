@@ -3,95 +3,139 @@
 Proyecto final del módulo *Artificial Intelligence Capstone Project*
 (Maestría, UCB Tarija). Abraham Chumacero Gaite.
 
-El sistema avisa qué lotes de insumos perecederos de la cafetería conviene
-usar primero porque, al ritmo de consumo actual y con el calendario que viene
-por delante, es probable que venzan con saldo.
+Cada mañana, el sistema revisa los lotes perecederos abiertos de la cafetería
+(leche, tomate, croissants…) y estima la probabilidad de que cada uno llegue a
+su fecha de vencimiento sin haberse usado entero. Por encima del umbral, el
+lote se marca «usar primero».
 
 | Elemento | Decisión |
 |---|---|
-| Problema | Merma por vencimiento: hoy el 13 % de los lotes vence con saldo |
-| Unidad de observación | Un lote de insumo revisado en una fecha |
-| Línea base | La práctica actual (FEFO a ojo, no avisa) y la **regla de cobertura**: avisar si, al ritmo de la última semana, el lote y los que van por delante no se terminan antes de vencer |
-| Modelo | LightGBM (clasificador binario), comparado también con regresión logística |
-| Métrica principal | **Recall** de la clase «vence con saldo». Complementarias: accuracy, precisión, F1, PR-AUC y aviso con 2 días o más |
-| Datos | Sintéticos y coherentes (18 meses, 13 insumos, calendario boliviano), con generador y semilla |
+| Objetivo | Estimar, para cada lote de insumo perecedero, la probabilidad de que venza antes de terminar de usarse, para priorizar su uso y disminuir el desperdicio |
+| Unidad de observación | Un lote con su cantidad restante, días para vencer y consumo reciente, revisado una mañana |
+| Línea base | La práctica actual (FEFO a ojo, que no avisa) y la **regla de cobertura**: avisar si, al ritmo de la última semana, el lote y los que van por delante no se terminan antes de vencer |
+| Modelos | Regresión logística como base y **LightGBM** como modelo principal |
+| Métrica principal | **Average Precision** del vencimiento. Para decidir: recall en el umbral, recall con 3 avisos por mañana, merma en bolivianos avisada a tiempo y precisión |
+| Datos | Copia de la base de datos de Kaffehaus: 6.396 lotes de 12 perecederos (oct 2021 – oct 2026), 32.406 revisiones |
+
+**Sobre el objetivo.** El Excel decía «estimar cuántas unidades de cada
+producto se venderán por día». Las otras columnas (la unidad de observación,
+la línea base, el clasificador y el recall de lotes vencidos) hablan de lotes,
+y la acción que reduce la merma también: «este lote, úsalo primero». Se
+reformuló el objetivo para que las cinco columnas sean coherentes. Las
+cantidades siguen ahí como entradas del modelo, en la unidad de cada producto
+(ml, g o unidades), y la pantalla muestra el sobrante estimado en esa unidad.
 
 ## Resultado en el conjunto de prueba
 
-| Método | Recall | Precisión | Accuracy | Aviso con ≥ 2 días |
-|---|---|---|---|---|
-| Práctica actual | 0,000 | — | 0,863 | 0 % |
-| Regla de cobertura | 0,819 | 0,782 | 0,944 | 77 % |
-| Regresión logística | 0,907 | 0,785 | 0,953 | 89 % |
-| **LightGBM** | **0,922** | 0,771 | 0,952 | **91 %** |
+7.811 revisiones de 1.590 lotes que ingresaron entre jul 2025 y sep 2026,
+evaluadas una sola vez:
 
-El modelo detecta 10,4 puntos más de lotes vencidos que la regla (bootstrap
-por lote, IC 95 % [3,3; 18,0]). En aciertos totales la diferencia no es
-significativa (McNemar p = 0,21). Detalle en `ml/README.md`.
+| Método | AP | Recall | Precisión | Accuracy | Recall con 3 avisos | Merma avisada a tiempo |
+|---|---|---|---|---|---|---|
+| Práctica actual | — | 0,000 | — | 0,895 | — | 0 % |
+| Regla de cobertura | 0,472 | 0,661 | **0,534** | **0,904** | 0,925 | 79 % |
+| Regresión logística | 0,464 | 0,866 | 0,293 | 0,766 | 0,874 | **97 %** |
+| **LightGBM** | **0,695** | **0,873** | 0,472 | 0,884 | **0,975** | 96 % |
+
+LightGBM ordena mejor los lotes (AP) y avisa de 21 puntos más de lotes
+vencidos que la regla (bootstrap por lote, IC 95 % [17; 25]). De los Bs 2.659
+que vencieron en prueba, sus avisos a tiempo cubren Bs 2.554; los de la
+regla, Bs 2.111. A cambio, acierta menos filas en total: la regla gana en
+accuracy y McNemar confirma que esa diferencia es real. Detalle y análisis de errores en [`api/training/README.md`](api/training/README.md).
 
 ## Piezas
 
 ```
-Navegador ──cookie httpOnly──▶ web (Next, BFF) ──Bearer──▶ Spring  :8081   productos, recetas, ventas…
-                                   │
-                                   └──────────Bearer──▶ ml-api  :8082   evaluacion-lote, modelo-riesgo
-                                                          (NestJS + modelo LightGBM en JSON)
-ml/ (Python) ──entrena y exporta──▶ ml-api/modelo/
+Navegador ──cookie httpOnly──▶ web  (Next.js, BFF)  :3408
+                                 │ Bearer
+                                 ▼
+                               api  (NestJS)  :8082 ──▶ Postgres (Docker)  :5433
+                                 ▲                       backup.sql restaurado
+api/training (Python) ──entrena y exporta──▶ api/model/
 ```
 
 | Carpeta | Qué es |
 |---|---|
-| `ml/` | Generador de datos, entrenamiento, evaluación, figuras y exportación del modelo |
-| `ml-api/` | Servicio NestJS con la arquitectura de `ucb-smc-api-v2` (contextos, CQRS, puertos) que ejecuta el modelo |
-| `web/` | La web de Kaffehaus. Se añadió la feature `vencimientos` en `/inventario`, con las reglas de su `RULES.md` |
-| `docs/` | Informe y capturas |
+| `api/training/` | Dataset desde la copia de la base, entrenamiento, evaluación, figuras y exportación del modelo |
+| `api/` | API NestJS: inicio de sesión y riesgo de cada lote. Ejecuta el modelo LightGBM exportado, sin reentrenar |
+| `web/` | Pantalla de lotes por vencer: lista con filtros, formulario para evaluar un lote, la comparación con la línea base y un recorrido guiado («Cómo funciona», con Driver.js) |
+| `docs/` | Informe técnico (PDF y Word), presentación y capturas |
 
 ## Cómo levantarlo
 
-Requisitos: Node 20+, Python 3.12+ (solo para reentrenar) y el backend Spring
-de Kaffehaus para iniciar sesión.
+Requisitos: Docker, Node 22 y la copia `backup.sql` (no se versiona: tiene
+datos personales). Python 3.12 solo para reentrenar.
 
-1. **Spring** (`api/kaffehausv4`), en el puerto 8081, como siempre.
-2. **Servicio de predicción:**
+1. **Base de datos**, desde esta carpeta:
 
-   ```bash
-   cd ml-api
-   npm install
-   cp .env.example .env      # mismos JWT_SECRET y JWT_ISSUER que Spring
-   npm run build && npm start
+   ```powershell
+   copy C:\ruta\a\backup.sql api\training\data\raw\backup.sql
+   docker compose up -d
+   docker compose ps          # esperar a «healthy»: la primera restauración tarda
    ```
 
-3. **Web:**
+2. **API**:
 
-   ```bash
+   ```powershell
+   cd api
+   npm install
+   copy .env.example .env
+   npm run build
+   npm start                  # http://localhost:8082/api/v1/health
+   ```
+
+3. **Web**, en otra terminal:
+
+   ```powershell
    cd web
    npm install
-   # en .env.local: API_URL=http://localhost:8081 y ML_API_URL=http://localhost:8082
-   npm run dev -- -p 3408
+   npm run build
+   npm start                  # http://localhost:3408
    ```
 
-4. Entrar con un usuario de Spring e ir a **Inventario**.
+4. Entrar con la cuenta de desarrollo que crea
+   [`api/database/seed-admin.sql`](api/database/seed-admin.sql) (el correo y la
+   contraseña están en su segunda línea).
 
-El modelo ya viene entrenado en `ml-api/modelo/`. Para reentrenarlo:
-`cd ml && pip install -r requirements.txt && python src/generar_datos.py && python src/entrenar.py`,
-y luego `cd ../ml-api && npm run modelo:actualizar`.
+El modelo ya viene entrenado en `api/model/`. Para reentrenarlo, ver
+[`api/training/README.md`](api/training/README.md).
 
 ## Pruebas
 
 | Dónde | Orden | Qué cubre |
 |---|---|---|
-| `ml-api` | `npm run check` | 32 unitarias (paridad con Python en 440 filas, árboles, reglas, handler, repositorio) y 10 de extremo a extremo por HTTP: caso válido, caso difícil, entrada inválida, reglas de negocio, autenticación |
-| `web` | `npm run check` | Tipos, lint, tokens, código muerto, auditoría de pantallas y 275 pruebas (25 de la feature nueva, incluido el flujo completo de la vista con `fetch` como único doble) |
-| Navegador | — | Recorrido en el build de producción con el servicio levantado: lista a 1280, 768 y 375 px, tema oscuro, tabla, ficha, formulario, filtros en móvil y evaluación completa. Capturas en `docs/capturas/` |
+| `api/training` | `pytest` | 31 pruebas: lectura del volcado, saldos por lote, calendario, variables y métricas (incluidas capacidad fija y merma en Bs) |
+| `api` | `npm run check` | Tipos, lint de capas, 70 unitarias (paridad con Python en 440 filas, reglas, handlers) y 18 HTTP (caso válido, caso difícil, 7 entradas inválidas, autenticación) |
+| `api` | `npm run test:db` | 6 pruebas contra la base restaurada: los 17 lotes abiertos coinciden con los del entrenamiento |
+| `web` | `npm run check` | Tipos, lint de capas y 51 pruebas, incluido el flujo completo de la pantalla con `fetch` como único doble y que cada paso del recorrido guiado tenga su elemento |
+| `web` | `npm run test:e2e` | 12 pruebas en Chromium sobre el build de producción, la API y la base reales: flujo completo, caso válido, caso difícil, entradas inválidas, recorrido guiado, sesión, consola limpia y sin scroll horizontal a 375, 768 y 1280 px |
+
+`test:e2e` levanta la API y la web si no están corriendo; la base tiene que
+estar arriba.
 
 ## Límites
 
-- **Los datos son sintéticos.** Las métricas dicen cuánto recupera el pipeline
-  de los mecanismos simulados, no cómo rinde en una cafetería real. Hay que
-  reentrenar con el kardex real antes de fiarse de un número.
-- El modelo solo conoce los 13 insumos y el calendario 2025–2027 con los que
-  se entrenó; fuera de eso responde 422 en vez de adivinar.
-- Las evaluaciones viven en memoria: al reiniciar `ml-api` se pierden las
-  manuales y se vuelve a sembrar el inventario.
-- De cada 100 avisos, 23 son falsas alarmas: el umbral se eligió para no dejar
-  pasar lotes que vencen, no para avisar poco.
+- El modelo solo conoce los 12 perecederos y el calendario 2021–2030 con los
+  que se entrenó. Fuera de eso la API responde 422 en vez de adivinar.
+- De cada 100 avisos, 53 son falsas alarmas: el umbral prioriza no dejar
+  pasar lotes que vencen.
+- Usa cantidades absolutas en la unidad del producto. Con valores muy lejos de
+  los habituales la probabilidad no tiene sentido, aunque la regla sí lo tenga.
+- El sobrante estimado que muestra la pantalla sale de la regla de cobertura,
+  no del modelo.
+- Con la copia de la base, la lista se calcula para la mañana siguiente al
+  último movimiento (4 oct 2026), no para hoy: contar los días desde la copia
+  como consumo cero marcaría todo en riesgo.
+- La etiqueta depende de que cada vencimiento se registre en el kardex. Un
+  lote tirado sin registrar cuenta como consumido.
+
+## Entregables
+
+| Qué | Dónde |
+|---|---|
+| Informe técnico | [`docs/Informe_Tecnico_Kaffehaus.pdf`](docs/Informe_Tecnico_Kaffehaus.pdf) (y `.docx`) |
+| Presentación | [`docs/Presentacion_Kaffehaus.pptx`](docs/Presentacion_Kaffehaus.pptx) |
+| Resultados de evaluación | [`api/training/results/metrics.json`](api/training/results/metrics.json), `errors_by_product.csv`, `errors_by_days.csv` y las figuras de `api/training/figures/` |
+| Dataset | Los CSV derivados en `api/training/data/` (sin datos de personas). La copia de la base no se versiona; con ella, `python src/build_dataset.py` los regenera |
+| Modelo final | `api/model/risk_model.json` (volcado de los árboles, umbral y métricas) y `api/training/artifacts/model_lightgbm.txt` |
+| Versión final | Etiqueta `v1.0` |

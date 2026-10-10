@@ -55,11 +55,9 @@ export interface Prediction {
 }
 
 /**
- * The trained model as the domain sees it: what it knows (products and
- * calendar) and what it decides (probability against a threshold).
- *
- * Loaded once by infrastructure and immutable. Nothing is trained or adjusted
- * at runtime: the API only reuses what `training/src/train.py` produced.
+ * The trained model: products, calendar, LightGBM trees and threshold.
+ * Prediction: features → probability → `atRisk` when it reaches the threshold
+ * chosen on validation. Nothing is trained at runtime.
  */
 export class RiskModel {
   private readonly products: ReadonlyMap<string, CatalogProduct>;
@@ -82,8 +80,7 @@ export class RiskModel {
 
   predict(review: LotReview): Prediction | DomainException {
     const input = review.input;
-    // The features look one week back and up to the expiry date. Outside the
-    // loaded calendar, "is it a class day" has no answer.
+    // Features use class days from a week before the review up to the expiry date.
     const weekBefore = isoDate(dayNumber(input.reviewedOn) - 7);
     if (!this.calendar.covers(weekBefore) || !this.calendar.covers(input.expiresOn)) {
       return DomainException.unprocessable(
@@ -108,13 +105,7 @@ export class RiskModel {
   }
 }
 
-/**
- * How much of this lot would be left on its expiry day at the recent pace.
- *
- * The arithmetic behind the coverage rule, shown so the person reads a
- * quantity ("about 2 L would be left") and not only a percentage. It is not
- * the model's output, and the screen says so.
- */
+/** Quantity left on the expiry day at last week's pace (coverage rule arithmetic, not the model). */
 function estimatedLeftover(review: LotReview): number | null {
   const { usage7d, stockAhead, remainingQuantity, expiresOn, reviewedOn } = review.input;
   if (usage7d === null) return null;

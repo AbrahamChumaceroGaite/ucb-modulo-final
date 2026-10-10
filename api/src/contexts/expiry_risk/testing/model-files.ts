@@ -6,11 +6,7 @@ import type { LotReviewInput } from '../domain/services/features';
 import type { LotReviewData } from '../domain/value_objects/lot-review.vo';
 import { RiskModelFileRepository } from '../infrastructure/model/risk-model.file.repository';
 
-/**
- * Test fixtures read from `model/`, the files the API ships with. Tests run
- * against the trained model, not a stand-in: a retrain that changes behaviour
- * shows up here.
- */
+/** Test fixtures read from `model/`: tests use the real trained model. */
 export function readModelFile<T>(file: string): T {
   return JSON.parse(readFileSync(join(MODEL_DIR, file), 'utf8')) as T;
 }
@@ -22,20 +18,14 @@ export function realRiskModel(): RiskModel {
   return cached;
 }
 
-/**
- * A catalog product by name. Quantities are in each product's own unit (ml,
- * g or units), so a test lot only means something next to its product.
- */
+/** A catalog product by name (quantities are in its own unit). */
 export function productNamed(name: string): CatalogProduct {
   const product = realRiskModel().card.products.find((item) => item.name === name);
   if (!product) throw new Error(`No product named ${name} in the model`);
   return product;
 }
 
-/**
- * One row of `parity.json`: what Python fed the model and what it got back.
- * Python writes NaN as `null`, because JSON has no NaN.
- */
+/** One row of `parity.json`: Python's inputs, features and probability (NaN written as `null`). */
 export interface ParityRow {
   input: {
     family: string;

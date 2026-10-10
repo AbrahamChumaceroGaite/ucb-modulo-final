@@ -6,10 +6,7 @@ import { PG_POOL, PostgresLifecycle, postgresPoolProvider } from './infrastructu
 import { HealthController } from './infrastructure/monitoring/health.controller';
 import { LoggerService } from './infrastructure/monitoring/logger.service';
 
-/**
- * Cross-cutting pieces, registered once: configuration, database pool,
- * logger and the global guard. Every context imports it.
- */
+/** Shared providers: configuration, database pool, logger and the global JWT guard. */
 @Global()
 @Module({
   controllers: [HealthController],

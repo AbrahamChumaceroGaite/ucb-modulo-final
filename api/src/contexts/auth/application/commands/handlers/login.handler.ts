@@ -8,11 +8,7 @@ import { TOKEN_SERVICE, type ITokenService } from '../../../domain/services/ITok
 import type { SessionResponse } from '../../types/session.types';
 import { LoginCommand } from '../login.command';
 
-/**
- * A hash in the stored format that matches no password. Checking it when the
- * email does not exist makes "unknown email" take as long as "wrong password",
- * so response times do not reveal which accounts exist.
- */
+/** Hashed when the email does not exist, so both failures take the same time. */
 const DECOY_HASH = 'pbkdf2$210000$AAAAAAAAAAAAAAAAAAAAAA==$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=';
 
 @CommandHandler(LoginCommand)
@@ -31,7 +27,6 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
     const matches = this.hasher.verify(dto.password, user?.passwordHash ?? DECOY_HASH);
 
     if (!user || !matches) {
-      // One message for both cases: which one failed is not the caller's business.
       return DomainException.unauthorized('Correo o contraseña incorrectos.');
     }
 

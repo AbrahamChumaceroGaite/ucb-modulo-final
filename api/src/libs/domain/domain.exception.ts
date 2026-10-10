@@ -1,12 +1,6 @@
 export type ErrorKind = 'Validation' | 'Unauthorized' | 'NotFound' | 'BusinessRule';
 
-/**
- * Business error, returned (not thrown) by the domain and the handlers.
- *
- * Same pattern as the course examples (`ucb-smc-api-v2`): the error travels
- * back up as a value and the controller decides. The message is written for
- * a person, in Spanish, because the web shows it as it comes.
- */
+/** Business error returned (not thrown) by the domain and handlers. The message is shown to the user, in Spanish. */
 export class DomainException extends Error {
   constructor(
     message: string,

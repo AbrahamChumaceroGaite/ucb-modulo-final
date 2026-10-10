@@ -11,3 +11,8 @@ __pycache__/
 test-results/
 playwright-report/
 api/training/data/raw/
+.pytest_cache/
+.ruff_cache/
+~$*
+publicar.bat
+web/next-env.d.ts

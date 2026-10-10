@@ -3,12 +3,9 @@ import { Injectable } from '@nestjs/common';
 import type { IPasswordHasher } from '../../domain/services/IPasswordHasher.interface';
 
 /**
- * Verifies the hashes already stored in `usuario.contrasena`.
- *
- * Format, as the cafeteria's previous backend wrote them:
- * `pbkdf2$<iterations>$<base64 salt>$<base64 hash>`, PBKDF2 with HMAC-SHA256.
- * The key length comes from the stored hash, so a different length still
- * verifies. The comparison is constant-time.
+ * Verifies the hashes in `usuario.contrasena`:
+ * `pbkdf2$<iterations>$<base64 salt>$<base64 hash>`, PBKDF2 with HMAC-SHA256,
+ * compared in constant time.
  */
 const PREFIX = 'pbkdf2';
 const DIGEST = 'sha256';

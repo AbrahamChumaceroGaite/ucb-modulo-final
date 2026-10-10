@@ -13,13 +13,7 @@ const LABELS: Record<keyof Dates, string> = {
   reviewedOn: 'revisión',
 };
 
-/**
- * The three dates of a review, consistent with each other.
- *
- * A lot that already expired is not evaluated: "will it expire before it is
- * used" has no answer any more, and the model never saw that case (training
- * rows stop on the expiry day).
- */
+/** Received, expiry and review dates. An already expired lot is rejected: training rows stop on the expiry day. */
 export class LotDates extends ValueObjectBase<Dates> {
   private constructor(value: Dates) {
     super(value);

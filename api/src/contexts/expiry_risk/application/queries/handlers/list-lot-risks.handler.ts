@@ -18,10 +18,9 @@ import type { LotRiskPage, LotRiskResponse } from '../../types/lot-risk.types';
 import { ListLotRisksQuery } from '../list-lot-risks.query';
 
 /**
- * Every perishable lot still open in the inventory, scored by the model.
- *
- * Computed on each request from the movements, never stored: a stored score
- * would go stale with the first sale of the day.
+ * Open perishable lots scored by the model, computed on each request.
+ * Flow: last movement day → review the next morning → read open lots →
+ * score each one → filter, sort by probability, paginate.
  */
 @QueryHandler(ListLotRisksQuery)
 export class ListLotRisksHandler implements IQueryHandler<ListLotRisksQuery> {
@@ -45,7 +44,7 @@ export class ListLotRisksHandler implements IQueryHandler<ListLotRisksQuery> {
     for (const lot of open) {
       const result = score(lot, model);
       if (DomainException.isDomainException(result)) {
-        // A lot the rules reject is a data problem, not a reason to fail the whole list.
+        // An inconsistent lot is skipped and logged; the rest of the list still loads.
         this.logger.warn(`Lot ${lot.lotId} skipped: ${result.message}`);
         continue;
       }
@@ -57,7 +56,7 @@ export class ListLotRisksHandler implements IQueryHandler<ListLotRisksQuery> {
   }
 }
 
-/** The same path a typed lot takes: domain rules first, then the model. */
+/** Same path as a typed lot: domain rules, then the model. */
 function score(lot: OpenLot, model: RiskModel): LotRiskResponse | DomainException {
   const product = model.product(lot.productId);
   if (!product) return DomainException.notFound(`El producto ${lot.productId} no está en el catálogo del modelo.`);

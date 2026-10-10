@@ -1,4 +1,16 @@
 node_modules/
 dist/
+.next/
 coverage/
 .env
+.env.local
+*.tsbuildinfo
+api/training/.venv/
+__pycache__/
+*.pyc
+test-results/
+playwright-report/
+api/training/data/raw/
+.pytest_cache/
+.ruff_cache/
+~$*

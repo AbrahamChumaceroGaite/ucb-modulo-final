@@ -1,12 +1,9 @@
 /**
- * Evaluates a LightGBM binary model from its JSON dump (`dump_model()`).
+ * Evaluates the LightGBM model from its JSON dump (`dump_model()`), so the API
+ * needs no Python. Probability = sigmoid(sum of the leaf reached in each tree);
+ * it matches Python to 1e-12 on the exported rows.
  *
- * Why not call Python: the API would need a second runtime and a process
- * boundary per request. The dump is the exact set of trees Python uses, so
- * evaluating it here gives the same probability; the parity test proves it to
- * 1e-12 on the exported rows.
- *
- * Split semantics, from LightGBM's `Tree::NumericalDecision`:
+ * Split rules, from LightGBM's `Tree::NumericalDecision`:
  * - `missing_type = None`: NaN is treated as 0 and compared.
  * - `missing_type = NaN`: NaN goes to the default side.
  * - `missing_type = Zero`: NaN and zero go to the default side.
@@ -74,7 +71,7 @@ function isLeaf(node: TreeNode): node is LeafNode {
   return 'leaf_value' in node;
 }
 
-/** Fails at load time, not at the first request, on a split this evaluator does not implement. */
+/** Rejects at load time any split type this evaluator does not implement. */
 function assertSupported(node: TreeNode): void {
   if (isLeaf(node)) return;
   if (node.decision_type !== '<=') {

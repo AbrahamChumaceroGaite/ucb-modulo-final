@@ -21,13 +21,7 @@ interface ModelArtifact {
   lightgbm: { objective: string; treeCount: number; trees: TreeNode[] };
 }
 
-/**
- * Loads the trained model from `MODEL_DIR` once, at startup.
- *
- * If the files are missing or out of step with this code, the API does not
- * start. A prediction service that boots without its model would answer
- * every request with an error whose cause is three layers away.
- */
+/** Loads `risk_model.json` and `calendar.json` from `MODEL_DIR` at startup; the API does not start if they do not match this code. */
 @Injectable()
 export class RiskModelFileRepository implements IRiskModelRepository {
   private readonly model: RiskModel;
@@ -36,8 +30,7 @@ export class RiskModelFileRepository implements IRiskModelRepository {
     const artifact = readJson<ModelArtifact>(config.modelDir, 'risk_model.json');
     const calendar = readJson<CalendarDefinition>(config.modelDir, 'calendar.json');
 
-    // The features are built here, in TypeScript. If training changed their
-    // list or order, every prediction would be silently wrong.
+    // Features are computed in TypeScript: their list and order must match training.
     if (artifact.features.join(',') !== FEATURES.join(',')) {
       throw new Error(
         `Las variables del modelo no coinciden con las que calcula la API.\nModelo: ${artifact.features.join(', ')}\nAPI: ${FEATURES.join(', ')}`,

@@ -6,12 +6,7 @@ import { TOKEN_SERVICE, type ITokenService } from '../../../domain/services/ITok
 import type { RefreshResponse } from '../../types/session.types';
 import { RefreshSessionCommand } from '../refresh-session.command';
 
-/**
- * A new access token for a valid refresh token.
- *
- * The account is read again: a user deleted after signing in stops getting
- * access tokens at the next refresh, at most 15 minutes later.
- */
+/** New access token for a valid refresh token. The account is read again, so a deleted user is cut off. */
 @CommandHandler(RefreshSessionCommand)
 export class RefreshSessionHandler implements ICommandHandler<RefreshSessionCommand> {
   constructor(

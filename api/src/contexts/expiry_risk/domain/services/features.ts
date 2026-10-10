@@ -2,13 +2,11 @@ import { dayNumber, weekday } from './iso-date';
 import type { OperatingCalendar } from './operating-calendar';
 
 /**
- * Raw inputs of one lot review → model features.
+ * Raw inputs of one lot review → the 18 model features.
  *
- * Line-by-line port of `training/src/features.py`, with the operations in the
- * same order: both sides use IEEE-754 doubles, so the same operations in the
- * same order give the same bits and no split threshold can be crossed by a
- * rounding difference. `features.spec.ts` checks it against 400+ rows that
- * Python exported. Unknown values are `NaN`, which is what LightGBM saw.
+ * Port of `training/src/features.py` with the operations in the same order, so
+ * both give the same values; `features.spec.ts` checks it against rows Python
+ * exported. Missing values are `NaN`, as in training.
  */
 export interface LotReviewInput {
   family: string;
@@ -107,9 +105,8 @@ export function coverageDays(features: readonly number[]): number | null {
 }
 
 /**
- * The baseline: flag the lot if, at the recent pace, the queue up to it is
- * not used up before it expires. Without usage data it cannot judge: `null`,
- * not `false`, because "I don't know" is not "no risk".
+ * Baseline (coverage rule): at last week's pace, the FEFO queue up to this lot
+ * is not used up before it expires. `null` when there is no usage data.
  */
 export function coverageRule(features: readonly number[]): boolean | null {
   const slack = features[SLACK_INDEX];

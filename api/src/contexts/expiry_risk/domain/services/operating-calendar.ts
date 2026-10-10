@@ -8,12 +8,7 @@ export interface CalendarDefinition {
   vacations: { from: string; to: string }[];
 }
 
-/**
- * Holidays and university vacations, known in advance.
- *
- * Training and inference read the same file, so "is this a class day" can
- * never mean two different things.
- */
+/** Bolivian holidays and university vacations; training and the API read the same `calendar.json`. */
 export class OperatingCalendar {
   private readonly holidays: ReadonlySet<string>;
 

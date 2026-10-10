@@ -6,11 +6,7 @@ interface Quantities {
   ahead: number;
 }
 
-/**
- * How much the lot held, how much is left and how much of the same product
- * will be used before this lot (its FEFO queue). All in the product's
- * content unit: ml, g or units.
- */
+/** Initial, remaining and ahead-in-FEFO quantities, in the product's unit (ml, g or und). */
 export class LotQuantities extends ValueObjectBase<Quantities> {
   private constructor(value: Quantities) {
     super(value);

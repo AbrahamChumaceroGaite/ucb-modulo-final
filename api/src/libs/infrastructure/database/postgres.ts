@@ -4,18 +4,14 @@ import { APP_CONFIG, type AppConfig } from '../config/app-config';
 
 export const PG_POOL = Symbol('PG_POOL');
 
-/**
- * One connection pool for the whole API. `pg` opens connections lazily, so
- * creating the pool does not touch the database: a wrong URL shows up on the
- * first query with PostgreSQL's own message.
- */
+/** One PostgreSQL pool for the API; connections open on the first query. */
 export const postgresPoolProvider: Provider = {
   provide: PG_POOL,
   inject: [APP_CONFIG],
   useFactory: (config: AppConfig) => new Pool({ connectionString: config.databaseUrl, max: 5 }),
 };
 
-/** Closes the pool on shutdown so `npm start` exits instead of hanging on open sockets. */
+/** Closes the pool on shutdown. */
 @Injectable()
 export class PostgresLifecycle implements OnApplicationShutdown {
   constructor(@Inject(PG_POOL) private readonly pool: Pool) {}

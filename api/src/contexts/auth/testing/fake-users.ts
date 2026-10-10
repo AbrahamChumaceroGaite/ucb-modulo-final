@@ -1,11 +1,7 @@
 import type { UserAccount } from '../domain/entities/user-account.entity';
 import type { IUserRepository } from '../domain/repositories/IUserRepository.interface';
 
-/**
- * PBKDF2-SHA256 of "molienda-fina-2026", 1000 iterations, salt 0x00..0x0f.
- * Computed with Python's `hashlib.pbkdf2_hmac`, an implementation independent
- * of the one under test. Not a real account's password.
- */
+/** PBKDF2-SHA256 of "molienda-fina-2026" (1000 iterations, salt 0x00..0x0f), computed with Python's hashlib. */
 export const TEST_PASSWORD = 'molienda-fina-2026';
 export const TEST_HASH = 'pbkdf2$1000$AAECAwQFBgcICQoLDA0ODw==$7XuzyYQBvEGlejF5hujD+fcdvjQB2t+YDQhgsW4wMlQ=';
 
