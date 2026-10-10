@@ -1,0 +1,24 @@
+# Base de datos de la cafetería para desarrollo.
+# Al crear el volumen por primera vez, Postgres ejecuta en orden los scripts
+# de /docker-entrypoint-initdb.d: primero restaura la copia y después crea el
+# usuario administrador de desarrollo. Para empezar de cero:
+#   docker compose down -v && docker compose up -d
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: kaffehausdb
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./api/training/data/raw/backup.sql:/docker-entrypoint-initdb.d/01-backup.sql:ro
+      - ./api/database/seed-admin.sql:/docker-entrypoint-initdb.d/02-seed-admin.sql:ro
+      - kaffehaus-ml-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d kaffehausdb"]
+      interval: 5s
+      retries: 30
+
+volumes:
+  kaffehaus-ml-db:

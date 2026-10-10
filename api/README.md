@@ -1,130 +1,175 @@
-# ml-api: servicio de predicción de vencimientos
+# API de Kaffehaus ML
 
-Servicio NestJS que carga el modelo LightGBM entrenado en `../ml` y responde
-qué lotes perecederos tienen riesgo de vencer con saldo. Lo consume la web de
-Kaffehaus a través de su BFF, igual que a Spring.
+Servicio NestJS con dos tareas: iniciar sesión contra las cuentas de la
+cafetería y decir qué lotes perecederos abiertos tienen riesgo de vencer con
+saldo. Lee la base de datos real de Kaffehaus (restaurada desde una copia) y
+ejecuta el modelo LightGBM que entrena `training/`.
+
+No usa el backend de Spring. La web habla solo con este servicio.
 
 ## Arrancar
 
-```bash
+Requisitos: Node 22, Docker (para la base) y la copia `backup.sql`.
+
+```powershell
+# 1. La copia de la base, que no se versiona porque tiene datos personales
+copy C:\ruta\a\backup.sql training\data\raw\backup.sql
+
+# 2. Postgres 16 en el puerto 5433, con la copia restaurada y un administrador de desarrollo
+docker compose up -d          # desde la carpeta raíz del proyecto
+
+# 3. La API
 npm install
-cp .env.example .env        # en Windows: copy .env.example .env
+copy .env.example .env
 npm run build
-npm start                   # http://localhost:8082/api/v1
+npm start                     # http://localhost:8082/api/v1/health
 ```
 
-`JWT_SECRET` y `JWT_ISSUER` tienen que ser **los mismos que usa Spring**
-(`seguridad.jwt.secreto-acceso` y `seguridad.jwt.emisor` en su
-`application.yaml`): el servicio acepta exactamente los access tokens que
-emite Spring y ninguno más. Los valores de `.env.example` son los de
-desarrollo de Spring.
+La primera vez, Postgres tarda en restaurar las 370 000 filas de
+movimientos; `docker compose ps` muestra `healthy` cuando termina. El script
+`database/seed-admin.sql` crea `admin@kaffehaus.bo` con la contraseña de
+desarrollo que está en su primera línea. Cámbiela antes de usar datos reales.
 
-Con el modelo cargado, el servicio arranca con los 14 lotes abiertos al corte
-del conjunto de datos ya evaluados. Se evalúan al arrancar, con el mismo
-comando y el mismo modelo que un lote escrito a mano; el archivo
-`modelo/lotes_vigentes.json` solo trae los datos crudos de cada lote.
+Si falta el modelo, el secreto o la URL de la base, la API no arranca y dice
+qué falta. No hay modo «a medias».
 
 ## Endpoints
 
-Contrato idéntico al de Spring: rutas en singular, respuesta sin envoltorio,
-paginación `skip`/`limit` y errores `{ codigo, tipo, mensaje, timestamp }`.
+Prefijo `/api/v1`. Todo pide `Authorization: Bearer <access token>` salvo
+`health`, `auth/login` y `auth/refresh`.
 
 | Método y ruta | Qué hace |
 |---|---|
-| `GET /salud` | Público. `{ "estado": "ok" }` |
-| `GET /modelo-riesgo` | Versión, umbral, catálogo de insumos, calendario cubierto y métricas de prueba del modelo y de la regla |
-| `GET /evaluacion-lote` | Lista paginada. Filtros: `search`, `riesgo` (`alto,vigilar,bajo`), `categoria`, `venceDesde`, `venceHasta`. Ordena por probabilidad descendente |
-| `GET /evaluacion-lote/:id` | Una evaluación |
-| `POST /evaluacion-lote` | Evalúa un lote con el modelo y guarda la respuesta. Reemplaza la evaluación anterior del mismo lote |
-| `DELETE /evaluacion-lote/:id` | Quita la evaluación de la lista (204) |
+| `GET /health` | `{ "status": "ok" }` |
+| `POST /auth/login` | `{ email, password }` → `{ user, accessToken, refreshToken }` |
+| `POST /auth/refresh` | `{ refreshToken }` → `{ accessToken }` |
+| `GET /lot-risk` | Lotes perecederos abiertos, con su riesgo, del más probable al menos. Filtros: `level` (`high,watch,low`), `family`, `search`, `skip`, `limit` |
+| `POST /lot-risk/evaluate` | Evalúa un lote escrito a mano («¿y si…?»). No guarda nada |
+| `GET /risk-model` | Ficha del modelo: versión, umbral, productos, particiones y métricas de prueba frente a la regla base |
 
-Cuerpo de `POST /evaluacion-lote`:
+`GET /lot-risk` revisa los lotes **la mañana siguiente al último movimiento
+registrado**. Con una base viva es hoy; con la copia, es el 4 de octubre de
+2026. Usar la fecha del reloj sobre una copia contaría cada día desde la copia
+como consumo cero y marcaría todo en riesgo.
+
+Cuerpo de `POST /lot-risk/evaluate` (cantidades en la unidad del producto:
+ml, g o unidades):
 
 ```json
 {
-  "codigoInsumo": "FRU-FRE",
-  "fechaIngreso": "2026-10-02",
-  "fechaVencimiento": "2026-10-05",
-  "fechaRevision": "2026-10-03",
-  "cantidadInicial": 1.5,
-  "cantidadRestante": 1.38,
-  "stockPorDelante": 0,
-  "consumo7d": 0.47,
-  "consumo28d": 0.52
+  "productId": "<id de GET /risk-model>",
+  "receivedOn": "2026-03-02",
+  "expiresOn": "2026-03-09",
+  "reviewedOn": "2026-03-04",
+  "initialQuantity": 1000,
+  "remainingQuantity": 900,
+  "stockAhead": 1000,
+  "usage7d": 100,
+  "usage28d": 150
 }
 ```
 
-| Respuesta | Cuándo |
+Los errores tienen siempre la misma forma, con el mensaje en español:
+
+```json
+{ "status": 422, "error": "BusinessRule", "message": "No puede quedar más de lo que tenía el lote.", "timestamp": "…" }
+```
+
+| Código | Cuándo |
 |---|---|
-| 201 | Evaluado: `probabilidad`, `nivel`, `enRiesgo`, `reglaDeCobertura`, `diasCobertura`, `sobranteEstimado`… |
-| 400 `Validación` | Forma incorrecta: fecha que no es `AAAA-MM-DD`, número negativo, campo desconocido |
-| 401 `NoAutorizado` | Sin token, token caducado, firmado con otro secreto o de tipo `refresco` |
-| 404 `NoEncontrado` | Id que no existe (o que no es un UUID) |
-| 422 `ReglaDeNegocio` | Insumo que el modelo no conoce, queda más de lo comprado, el lote ya venció, fechas fuera del calendario cargado |
+| 400 `Validation` | Forma incorrecta: campo desconocido, texto donde va un número, fecha que no es `AAAA-MM-DD`, filtro con un valor que no existe |
+| 401 `Unauthorized` | Correo o contraseña incorrectos (un solo mensaje para los dos casos), sin token, token caducado o refresh token usado como access token |
+| 404 `NotFound` | Ruta que no existe |
+| 422 `BusinessRule` | Producto que el modelo no conoce, queda más de lo que entró, el lote ya venció, fechas fuera del calendario 2021–2030 |
 
 ## Arquitectura
 
-La de `ucb-smc-api-v2`, aplicada a un contexto:
+La del curso (`ucb-smc-api-v2`): contextos con cuatro capas, CQRS con
+`@nestjs/cqrs` y puertos inyectados por token.
 
 ```
 src/
-├─ main.ts, app.module.ts, configurar-app.ts
-├─ libs/                       lo transversal (core.module, excepción, filtro, JWT, paginación)
-└─ contexts/prediccion_vencimiento/
-   ├─ domain/                  agregado, objetos de valor, entidad del modelo, servicios puros, puertos
-   ├─ application/             comandos, consultas y sus handlers (CQRS), DTO, tipos, mapeo a respuesta
-   ├─ infrastructure/          carga del modelo, repositorio en memoria, siembra del inventario
-   └─ presentation/            controladores
+├─ main.ts, app.module.ts, configure-app.ts
+├─ libs/                  lo compartido: excepción de dominio, paginación, configuración,
+│                         pool de Postgres, guard JWT, filtro de errores, logger
+└─ contexts/
+   ├─ auth/               inicio de sesión
+   └─ expiry_risk/        riesgo de vencimiento
+      ├─ domain/          objetos de valor, entidad RiskModel, cálculo de variables, árboles, puertos
+      ├─ application/     consultas y handlers, DTO, mapeo a respuesta
+      ├─ infrastructure/  carga del modelo desde archivo, lectura de lotes en Postgres
+      └─ presentation/    controladores
 ```
 
-Lo que se mantiene del SMC: contextos con sus cuatro capas, CQRS con
-`@nestjs/cqrs`, puertos inyectados por token de texto, `DomainException`
-devuelta en vez de lanzada y objetos de valor con `create()` que valida.
+Las dependencias van hacia dentro y las comprueba `npm run lint`, no la buena
+voluntad: el dominio no importa Nest, `pg` ni `jsonwebtoken`; la aplicación no
+importa infraestructura (salvo el logger); un contexto no importa al otro. Se
+probó plantando cada tipo de violación.
 
-Lo que cambia, y por qué:
+Decisiones que vale la pena explicar:
 
-- **Sin envoltorio `{ success, code, data }`.** La web consume el contrato de
-  Spring; con envoltorio tendría dos contratos. El controlador desenvuelve el
-  resultado del handler (`desenvolver`) y el filtro global escribe el error
-  como Spring.
-- **Ids de texto (UUID)**, porque la web trata todo id como texto.
-- **Repositorio en memoria** detrás de los mismos puertos que tendría uno de
-  Prisma. Las evaluaciones son datos derivados (lote de Spring más respuesta
-  del modelo) y el servicio todavía no tiene tabla propia. Pasar a base de
-  datos es una clase nueva en `infrastructure/`.
-- **Sin eventos de dominio.** Nadie los consumiría todavía, y escribirlos
-  «por si acaso» sería código muerto.
+- **Sin tablas propias.** El riesgo se calcula en cada petición a partir de
+  los movimientos. Guardarlo lo dejaría viejo con la primera venta del día.
+- **Los handlers devuelven `T | DomainException`** y el controlador la lanza
+  con `unwrap`. El filtro global escribe la respuesta de error.
+- **Tokens sin estado.** No hay tabla de sesiones. Cerrar sesión borra las
+  cookies en la web, pero un refresh token robado vale hasta que caduca
+  (7 días). Para este alcance se aceptó; con usuarios reales habría que
+  guardarlos y poder revocarlos.
+- **Contraseñas:** se verifican los hashes que ya existen en `usuario`
+  (PBKDF2-SHA256, `pbkdf2$iteraciones$sal$hash`) en tiempo constante. Si el
+  correo no existe se calcula igual un hash señuelo, para que el tiempo de
+  respuesta no revele qué cuentas existen.
 
-## El modelo, en TypeScript y sin Python
+## El modelo, en TypeScript
 
-`domain/services/bosque-lightgbm.ts` evalúa el volcado JSON de LightGBM
-(`modelo/modelo_riesgo.json`, 148 árboles) siguiendo sus reglas de valores
-faltantes. `domain/services/caracteristicas.ts` replica línea a línea
-`ml/src/caracteristicas.py`. La prueba `caracteristicas.spec.ts` compara las
-dos implementaciones sobre 440 revisiones exportadas por Python, 40 de ellas
-con consumo faltante: las 18 variables coinciden bit a bit y la probabilidad
-difiere en menos de 1e-12. Nada se entrena ni se ajusta en el servicio.
+`domain/services/lightgbm-forest.ts` recorre los 139 árboles del volcado JSON
+de LightGBM con sus reglas de valores faltantes. `domain/services/features.ts`
+replica `training/src/features.py` con las operaciones en el mismo orden. Los
+tests comparan ambos lados sobre 440 revisiones exportadas por Python (11 sin
+consumo de 7 días, 46 sin el de 28): las 18 variables coinciden bit a bit y la
+probabilidad difiere en menos de 1e-12. La API no entrena ni ajusta nada.
 
 Para cambiar de modelo:
 
-```bash
-cd ../ml && python src/entrenar.py
-cd ../ml-api && npm run modelo:actualizar && npm run check
+```powershell
+cd training && .venv\Scripts\python src\train.py
+cd .. && npm run model:update && npm run check
 ```
 
-Si el entrenamiento cambiara las variables o su orden, el servicio no arranca
-y lo dice: compara la lista del modelo con la que calcula.
+Si el entrenamiento cambió las variables, su orden o el tope de cobertura, la
+API se niega a arrancar y lo dice.
+
+**Límite que hay que conocer:** el modelo usa cantidades absolutas en la
+unidad del producto. Con valores muy lejos de los que vio (10 000 naranjas
+y 500 al día, cuando un lote real trae 20) la respuesta no tiene sentido,
+aunque la regla de cobertura sí lo tenga. La web muestra la unidad de cada
+producto para evitar ese error.
 
 ## Pruebas
 
 ```bash
-npm test            # 32 pruebas: paridad con Python, árboles, objetos de valor, handler, repositorio
-npm run test:e2e    # 10 pruebas HTTP con la aplicación entera, sin dobles
-npm run check       # tipos + las dos
+npm test            # 70 pruebas unitarias
+npm run test:e2e    # 18 pruebas HTTP con la aplicación entera
+npm run check       # tipos + lint + las dos
 ```
 
-Las de extremo a extremo cubren el caso válido completo (registrar, leer,
-buscar, quitar), un caso difícil (sin consumo de 28 días y el lote vence ese
-día), entradas inválidas (400), reglas de negocio (422), el reemplazo de una
-evaluación al revisar el mismo lote y la autenticación con tokens como los de
-Spring (HS256 y HS384, rechazo del refresh token).
+- **Paridad con Python:** variables y probabilidades de las 440 filas.
+- **Caso válido:** tomates que no se alcanzan a usar → `high`; leche que rota
+  rápido → `low`.
+- **Caso difícil:** sin historial de 28 días y revisado el mismo día que vence.
+- **Entradas inválidas:** 7 casos de 400 y 422 por HTTP, 11 reglas de los
+  objetos de valor.
+- **Flujo completo:** login → lista → refresh → lista, más rutas protegidas,
+  refresh token rechazado como access token y 404 en español.
+
+Las pruebas e2e cambian los dos repositorios de Postgres por versiones en
+memoria; el resto (guard, validación, filtro, CQRS, modelo real) es el mismo
+que arranca `npm start`. Se comprobó que fallan al romper a propósito: la
+fórmula de holgura, el lado por defecto de los valores faltantes, el hash
+señuelo, el tipo de token del guard y la fecha de revisión.
+
+**No verificado todavía:** el SQL de `OpenLotPostgresRepository` y
+`UserPostgresRepository` contra la base restaurada (Docker no estaba
+disponible). La prueba prevista: con la copia, `GET /lot-risk` debe devolver
+los mismos 17 lotes abiertos que `training/data/open_lots.json`.

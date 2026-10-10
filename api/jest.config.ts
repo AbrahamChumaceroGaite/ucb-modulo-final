@@ -5,10 +5,7 @@ const config: Config = {
   rootDir: 'src',
   testRegex: '.*\\.spec\\.ts$',
   transform: { '^.+\\.ts$': ['ts-jest', { tsconfig: '<rootDir>/../tsconfig.json' }] },
-  moduleNameMapper: {
-    '^@libs$': '<rootDir>/libs/src/index',
-    '^@libs/(.*)$': '<rootDir>/libs/src/$1',
-  },
+  moduleNameMapper: { '^@libs/(.*)$': '<rootDir>/libs/$1' },
   setupFiles: ['reflect-metadata'],
   testEnvironment: 'node',
 };

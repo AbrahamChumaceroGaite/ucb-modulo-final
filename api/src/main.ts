@@ -1,24 +1,24 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
-import { CONFIGURACION, LoggerService, type Configuracion } from '@libs';
+import { APP_CONFIG, LoggerService, type AppConfig } from '@libs/infrastructure';
 import { AppModule } from './app.module';
-import { configurarApp } from './configurar-app';
+import { configureApp } from './configure-app';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   const logger = await app.resolve(LoggerService);
-  logger.setContext('Arranque');
+  logger.setContext('Bootstrap');
   app.useLogger(logger);
 
-  const configuracion = app.get<Configuracion>(CONFIGURACION);
-  configurarApp(app, configuracion);
+  const config = app.get<AppConfig>(APP_CONFIG);
+  configureApp(app, config);
 
-  await app.listen(configuracion.puerto, configuracion.host);
-  logger.log(`Servicio de predicción escuchando en ${configuracion.host}:${configuracion.puerto}/${configuracion.prefijo}`);
+  await app.listen(config.port, config.host);
+  logger.log(`API listening on ${config.host}:${config.port}/${config.prefix}`);
 }
 
 bootstrap().catch((error: unknown) => {
-  // Without the model or the secret the service must not pretend to work.
-  console.error('No se pudo iniciar el servicio de predicción:', error instanceof Error ? error.message : error);
+  // Without the model, the secret or the database URL the API must not pretend to work.
+  console.error('No se pudo iniciar la API:', error instanceof Error ? error.message : error);
   process.exit(1);
 });

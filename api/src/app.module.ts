@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
+import { AuthModule } from './contexts/auth/auth.module';
+import { ExpiryRiskModule } from './contexts/expiry_risk/expiry_risk.module';
 import { CoreModule } from './libs/core.module';
-import { PrediccionVencimientoModule } from './contexts/prediccion_vencimiento/prediccion_vencimiento.module';
 
 @Module({
-  imports: [CoreModule, PrediccionVencimientoModule],
+  imports: [CoreModule, AuthModule, ExpiryRiskModule],
 })
 export class AppModule {}

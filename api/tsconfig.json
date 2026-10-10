@@ -25,8 +25,7 @@
     "incremental": false,
     "types": ["node", "jest"],
     "paths": {
-      "@libs": ["libs/src/index"],
-      "@libs/*": ["libs/src/*"]
+      "@libs/*": ["libs/*"]
     }
   },
   "include": ["src/**/*"]
