@@ -1,0 +1,457 @@
+@import 'tailwindcss';
+/* Estilos base de driver.js. Se importan aquí y no en un componente para que
+   todo el CSS del proyecto siga entrando por un único archivo. */
+@import 'driver.js/dist/driver.css';
+
+/*
+  Kaffehaus — único archivo CSS del proyecto.
+
+  Aquí viven TODOS los tokens. No hay `tailwind.config.ts` (en Tailwind v4 solo
+  se lee con `@config`, así que sería código muerto) y no hay ningún otro .css.
+
+  Regla que comprueba `scripts/audit-tokens.mjs`: todo token que el código use
+  tiene que estar declarado aquí. Auditamos una librería con 34 tokens usados y
+  nunca definidos — su botón primario salía transparente.
+*/
+
+/* El tema lo decide un atributo en <html>, no una media query suelta: así el
+   interruptor puede ganarle a la preferencia del sistema en ambos sentidos. */
+@custom-variant dark (&:where([data-tema='oscuro'], [data-tema='oscuro'] *));
+
+@theme {
+  /* ─── Color · claro ──────────────────────────────────────────────────────
+     Nombres tomados de DESIGN.md tal cual, para que diseño y código hablen
+     el mismo idioma. Paleta sacada del tostado del café. */
+  --color-surface: #fff8f6;
+  --color-surface-dim: #ffd0b9;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #fff1eb;
+  --color-surface-container: #ffeae0;
+  --color-surface-container-high: #ffe2d5;
+  --color-surface-container-highest: #ffdbca;
+
+  --color-on-surface: #2e1506;
+  --color-on-surface-variant: #50443c;
+
+  --color-outline: #83746a;
+  --color-outline-variant: #d5c3b8;
+
+  --color-primary: #583311;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #ffdcc2;
+  --color-on-primary-container: #643e1b;
+
+  --color-secondary: #914d04;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #ffdcc4;
+  --color-on-secondary-container: #6f3800;
+
+  --color-success: #4f6b3f;
+  --color-on-success: #ffffff;
+  --color-success-container: #dcefd0;
+
+  --color-warning: #8a5a12;
+  --color-on-warning: #ffffff;
+  --color-warning-container: #ffe2bd;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+
+  /* ─── Radio · nada es cuadrado ────────────────────────────────────────────
+     No existe `lg` a propósito: está prohibido por las reglas de diseño.
+     `md` es el suelo de todo lo interactivo. */
+  /* Solo para controles de 16-20 px —casillas, puntos—, donde `sm` los
+     convertiría en círculos y una casilla dejaría de distinguirse de un radio. */
+  --radius-xs: 0.3125rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* ─── Tipografía ──────────────────────────────────────────────────────────
+     Inter para trabajar. Playfair solo en la landing y títulos display. */
+  --font-sans: var(--fuente-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--fuente-playfair), Georgia, 'Times New Roman', serif;
+
+  /* ─── Espaciado ───────────────────────────────────────────────────────────
+     No se declaran `--spacing-xs/sm/md/xl`. Parece inofensivo y no lo es: en
+     Tailwind v4 esos nombres **sombrean** la escala de `max-w-*`, `w-*` y `h-*`,
+     así que `max-w-md` pasaba a valer 24 px y un párrafo se partía en una
+     palabra por línea. Lo descubrimos viéndolo en pantalla, no leyendo el CSS.
+
+     La escala de DESIGN.md (4 / 12 / 24 / 80) ya existe en Tailwind como
+     `1 / 3 / 6 / 20`. Se usa esa. */
+
+  /* ─── Sombra · tintada en espresso, nunca negra ───────────────────────── */
+  --shadow-ambient: 0 8px 24px -8px rgb(46 21 6 / 0.12);
+  --shadow-flotante: 0 12px 32px -12px rgb(46 21 6 / 0.28);
+
+  /* ─── Medidas del armazón ─────────────────────────────────────────────── */
+  --spacing-cabecera: 3.5rem;
+  --spacing-menu-flotante: 4.5rem;
+  --spacing-lienzo: 82rem;
+
+  /* ─── Movimiento ──────────────────────────────────────────────────────── */
+  --ease-suave: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Se pasa del destino y vuelve. Es lo que hace que una pastilla que se
+     desplaza parezca una burbuja y no un rectángulo que cambia de sitio. */
+  --ease-burbuja: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ─── Color · oscuro ────────────────────────────────────────────────────────
+   No es el claro invertido: es la paleta de un café con la luz baja. Los
+   fondos van de espresso a tierra y los acentos suben de saturación para
+   mantener el contraste AA sobre superficies oscuras. */
+[data-tema='oscuro'] {
+  --color-surface: #16100c;
+  --color-surface-dim: #100b08;
+  --color-surface-container-lowest: #0d0907;
+  --color-surface-container-low: #1c1511;
+  --color-surface-container: #221a15;
+  --color-surface-container-high: #2b211a;
+  --color-surface-container-highest: #362a21;
+
+  --color-on-surface: #f5e9e1;
+  --color-on-surface-variant: #c4b0a3;
+
+  --color-outline: #8c7a6d;
+  --color-outline-variant: #3d3027;
+
+  --color-primary: #f4bb8e;
+  --color-on-primary: #2e1500;
+  --color-primary-container: #4a2c0e;
+  --color-on-primary-container: #ffdcc2;
+
+  --color-secondary: #fda45a;
+  --color-on-secondary: #2f1500;
+  --color-secondary-container: #5c3000;
+  --color-on-secondary-container: #ffdcc4;
+
+  --color-success: #a9d18f;
+  --color-on-success: #1b3310;
+  --color-success-container: #2d4620;
+
+  --color-warning: #f0bd72;
+  --color-on-warning: #3a2600;
+  --color-warning-container: #513600;
+
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+  --color-error-container: #5c1216;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-outline-variant);
+  }
+
+  html {
+    color-scheme: light;
+    scroll-behavior: smooth;
+  }
+
+  [data-tema='oscuro'] {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Sin anillo de foco no se entrega nada. Se aplica al documento entero para
+     que ningún componente pueda olvidarlo. */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Las cifras de las tablas alinean en columna. */
+  table,
+  [data-tabular] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Quien pide menos movimiento, no ve movimiento. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Barra de desplazamiento con los tokens del tema. La nativa desentona. */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-outline-variant);
+    border-radius: var(--radius-full);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-outline);
+  }
+}
+
+@layer components {
+  /*
+    Campo con etiqueta flotante.
+
+    Está en CSS y no en doce variantes arbitrarias de Tailwind porque son seis
+    selectores `:has()` y en clases quedaban ilegibles. Aquí se lee de una vez
+    y vive donde el proyecto dice que vive el CSS: en este archivo.
+
+    ## La etiqueta no sale del campo
+
+    Descansa centrada y al escribir sube a la franja de arriba, **dentro** del
+    control. No se monta sobre el borde.
+
+    La primera versión sí lo hacía, con un trocito de fondo que cortaba la
+    línea. Funciona solo si ese fondo coincide con lo que hay detrás, y detrás
+    hay tarjetas, diálogos y paneles de colores distintos: sobre una tarjeta se
+    veía un rectángulo negro pegado al borde. Un truco que depende de adivinar
+    el fondo del vecino no es un truco, es una avería a plazos.
+
+    El precio son 4 px de alto: el campo pequeño mide 36 y no 32. Se pagan.
+  */
+  .campo-flotante {
+    position: relative;
+  }
+
+  .campo-flotante > label {
+    position: absolute;
+    top: 50%;
+    left: 0.625rem;
+    z-index: 10;
+    max-width: calc(100% - 1.25rem);
+    transform: translateY(-50%);
+    overflow: hidden;
+    color: var(--color-on-surface-variant);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    pointer-events: none;
+    transition:
+      top 150ms var(--ease-suave),
+      left 150ms var(--ease-suave),
+      transform 150ms var(--ease-suave),
+      font-size 150ms var(--ease-suave),
+      color 150ms var(--ease-suave);
+  }
+
+  /* Con icono a la izquierda, la etiqueta arranca donde arranca el texto. El
+     control se marca a sí mismo con `data-icono`: el campo no puede saberlo. */
+  .campo-flotante:has(input[data-icono='sm']) > label {
+    left: 2rem;
+  }
+  .campo-flotante:has(input[data-icono='md']) > label {
+    left: 2.5rem;
+  }
+
+  /* El área de texto es alta: su etiqueta descansa arriba, no en el centro. */
+  .campo-flotante:has(textarea) > label {
+    top: 0.75rem;
+    transform: none;
+  }
+
+  /* Flotada: con foco, con contenido, o siempre en un `select` —un desplegable
+     nunca está «vacío», siempre enseña su marcador—. */
+  .campo-flotante:has(input:focus) > label,
+  .campo-flotante:has(textarea:focus) > label,
+  .campo-flotante:has(select:focus) > label,
+  .campo-flotante:has(input:not(:placeholder-shown)) > label,
+  .campo-flotante:has(textarea:not(:placeholder-shown)) > label,
+  .campo-flotante:has(select) > label {
+    top: 0.3125rem;
+    transform: none;
+    font-size: 0.625rem;
+    line-height: 0.75rem;
+    font-weight: 600;
+  }
+
+  /*
+    Al flotar, la etiqueta **conserva** el margen del icono.
+
+    Devolverla al borde izquierdo parecía lógico —arriba no hay icono— pero el
+    icono está centrado en los 36 px del campo y su caja llega hasta la franja
+    de la etiqueta: se montaban. Se vio en pantalla, no leyendo el CSS.
+  */
+
+  .campo-flotante:has(input:focus) > label,
+  .campo-flotante:has(textarea:focus) > label,
+  .campo-flotante:has(select:focus) > label {
+    color: var(--color-secondary);
+  }
+
+  .campo-flotante:has([aria-invalid='true']) > label {
+    color: var(--color-error);
+  }
+
+  /* El marcador se calla mientras la etiqueta ocupa su sitio, y aparece al
+     enfocar como pista de formato. Los dos a la vez se pisan. */
+  .campo-flotante :is(input, textarea)::placeholder {
+    opacity: 0;
+    transition: opacity 150ms var(--ease-suave);
+  }
+  .campo-flotante :is(input, textarea):focus::placeholder {
+    opacity: 1;
+  }
+}
+
+@layer utilities {
+  /* Etiqueta de categoría: 12px, semibold, mayúsculas y tracking amplio.
+     Es parte de la firma visual del producto, no una decoración suelta. */
+  .label-caps {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Recorta el icono de fondo de las tarjetas contra su propio borde. */
+  .marca-fondo {
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* Los puntos que sustituyen al spinner. Tres puntos desfasados dicen
+     "trabajando" sin fingir que conocen el progreso. */
+  .puntos-carga > span {
+    animation: kh-punto 1.2s var(--ease-suave) infinite;
+  }
+  .puntos-carga > span:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .puntos-carga > span:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  /* El skeleton no parpadea: una veta de luz lo recorre. El parpadeo cansa
+     la vista en una pantalla que se mira todo el día. */
+  .kh-skeleton {
+    position: relative;
+    overflow: hidden;
+  }
+  .kh-skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--color-on-surface) 7%, transparent),
+      transparent
+    );
+    animation: kh-veta 1.6s var(--ease-suave) infinite;
+  }
+}
+
+/* La burbuja del segmentado: se estira en el sentido de la marcha y rebota al
+   llegar. Es la deformación la que vende el movimiento, no el desplazamiento. */
+@keyframes kh-burbuja {
+  0% {
+    transform: scale(0.82, 1.14);
+  }
+  55% {
+    transform: scale(1.06, 0.94);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+/* La hoja sube desde el borde inferior; el panel entra desde el lado. Dos
+   gestos distintos porque son dos superficies distintas, no la misma en dos
+   tamaños. */
+@keyframes kh-hoja-sube {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes kh-panel-entra {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes kh-punto {
+  0%,
+  60%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+/* El skeleton no parpadea: una veta de luz lo recorre. El parpadeo cansa. */
+@keyframes kh-veta {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+/* driver.js: se pinta con los tokens del sistema en vez de su tema por
+   defecto, que es azul y no tiene nada que ver con Kaffehaus. */
+.driver-popover.kh-tour {
+  background-color: var(--color-surface-container-high);
+  color: var(--color-on-surface);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-flotante);
+  font-family: var(--font-sans);
+}
+.driver-popover.kh-tour .driver-popover-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+.driver-popover.kh-tour .driver-popover-description {
+  font-size: 0.8125rem;
+  color: var(--color-on-surface-variant);
+}
+.driver-popover.kh-tour .driver-popover-progress-text {
+  font-size: 0.75rem;
+  color: var(--color-on-surface-variant);
+}
+.driver-popover.kh-tour .driver-popover-navigation-btns button {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8125rem;
+  text-shadow: none;
+}
+.driver-popover.kh-tour .driver-popover-arrow {
+  border-color: var(--color-surface-container-high);
+}
