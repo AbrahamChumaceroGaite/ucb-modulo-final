@@ -1,0 +1,366 @@
+{
+  "partitions": {
+    "train": {
+      "rows": 17285,
+      "lots": 3308,
+      "positiveShare": 0.19392536881689326,
+      "from": "2021-10-01",
+      "to": "2024-06-30"
+    },
+    "validation": {
+      "rows": 6335,
+      "lots": 1272,
+      "positiveShare": 0.1138121546961326,
+      "from": "2024-07-29",
+      "to": "2025-06-30"
+    },
+    "test": {
+      "rows": 7811,
+      "lots": 1590,
+      "positiveShare": 0.10510818077070798,
+      "from": "2025-07-29",
+      "to": "2026-09-30"
+    }
+  },
+  "test": {
+    "current": {
+      "recall": 0.0,
+      "precision": 0.0,
+      "accuracy": 0.8948918192292921,
+      "f1": 0.0,
+      "prAuc": null,
+      "truePositives": 0,
+      "falsePositives": 0,
+      "falseNegatives": 821,
+      "trueNegatives": 6990,
+      "earlyWarning2Days": 0.0
+    },
+    "rule": {
+      "recall": 0.6613885505481121,
+      "precision": 0.5339233038348082,
+      "accuracy": 0.9037255152989374,
+      "f1": 0.5908596300326442,
+      "prAuc": null,
+      "truePositives": 543,
+      "falsePositives": 474,
+      "falseNegatives": 278,
+      "trueNegatives": 6516,
+      "earlyWarning2Days": 0.7735849056603774
+    },
+    "logistic": {
+      "recall": 0.8660170523751523,
+      "precision": 0.2927130506381227,
+      "accuracy": 0.7659710664447574,
+      "f1": 0.43753846153846154,
+      "prAuc": 0.46423497289390353,
+      "truePositives": 711,
+      "falsePositives": 1718,
+      "falseNegatives": 110,
+      "trueNegatives": 5272,
+      "earlyWarning2Days": 0.9685534591194969,
+      "threshold": 0.25948342206583125
+    },
+    "model": {
+      "recall": 0.8733252131546894,
+      "precision": 0.4723320158102767,
+      "accuracy": 0.8841377544488542,
+      "f1": 0.6130825138948268,
+      "prAuc": 0.6945996951950356,
+      "truePositives": 717,
+      "falsePositives": 801,
+      "falseNegatives": 104,
+      "trueNegatives": 6189,
+      "earlyWarning2Days": 0.9433962264150944,
+      "threshold": 0.140225317324589
+    }
+  },
+  "validation": {
+    "rule": {
+      "recall": 0.6588072122052705,
+      "precision": 0.5536130536130536,
+      "accuracy": 0.9007103393843725,
+      "f1": 0.6016466117796073,
+      "prAuc": null,
+      "truePositives": 475,
+      "falsePositives": 383,
+      "falseNegatives": 246,
+      "trueNegatives": 5231
+    },
+    "logistic": {
+      "recall": 0.8515950069348127,
+      "precision": 0.3110435663627153,
+      "accuracy": 0.768429360694554,
+      "f1": 0.4556586270871985,
+      "prAuc": null,
+      "truePositives": 614,
+      "falsePositives": 1360,
+      "falseNegatives": 107,
+      "trueNegatives": 4254
+    },
+    "model": {
+      "recall": 0.8515950069348127,
+      "precision": 0.4912,
+      "accuracy": 0.8827150749802684,
+      "f1": 0.6230339928970066,
+      "prAuc": null,
+      "truePositives": 614,
+      "falsePositives": 636,
+      "falseNegatives": 107,
+      "trueNegatives": 4978
+    }
+  },
+  "comparison": {
+    "mcnemarModelVsRule": {
+      "onlyModelRight": 297,
+      "onlyRuleRight": 450,
+      "pValue": 2.4018536761894452e-08
+    },
+    "bootstrapRecallModelMinusRule": {
+      "recallDifference": 0.21155157144048586,
+      "ci95": [
+        0.17098626452024443,
+        0.25181733921853955
+      ]
+    }
+  },
+  "hyperparameterSearch": [
+    {
+      "num_leaves": 7,
+      "learning_rate": 0.03,
+      "min_child_samples": 20,
+      "trees": 480,
+      "validationPrAuc": 0.7247873675251428
+    },
+    {
+      "num_leaves": 7,
+      "learning_rate": 0.03,
+      "min_child_samples": 60,
+      "trees": 522,
+      "validationPrAuc": 0.7267583676495442
+    },
+    {
+      "num_leaves": 7,
+      "learning_rate": 0.08,
+      "min_child_samples": 20,
+      "trees": 157,
+      "validationPrAuc": 0.7256432982726543
+    },
+    {
+      "num_leaves": 7,
+      "learning_rate": 0.08,
+      "min_child_samples": 60,
+      "trees": 189,
+      "validationPrAuc": 0.7216370789282631
+    },
+    {
+      "num_leaves": 15,
+      "learning_rate": 0.03,
+      "min_child_samples": 20,
+      "trees": 242,
+      "validationPrAuc": 0.7158874146712582
+    },
+    {
+      "num_leaves": 15,
+      "learning_rate": 0.03,
+      "min_child_samples": 60,
+      "trees": 265,
+      "validationPrAuc": 0.7202835025645923
+    },
+    {
+      "num_leaves": 15,
+      "learning_rate": 0.08,
+      "min_child_samples": 20,
+      "trees": 139,
+      "validationPrAuc": 0.7285044005882432
+    },
+    {
+      "num_leaves": 15,
+      "learning_rate": 0.08,
+      "min_child_samples": 60,
+      "trees": 80,
+      "validationPrAuc": 0.7119085035900627
+    },
+    {
+      "num_leaves": 31,
+      "learning_rate": 0.03,
+      "min_child_samples": 20,
+      "trees": 156,
+      "validationPrAuc": 0.7083493519179009
+    },
+    {
+      "num_leaves": 31,
+      "learning_rate": 0.03,
+      "min_child_samples": 60,
+      "trees": 180,
+      "validationPrAuc": 0.7168444507317994
+    },
+    {
+      "num_leaves": 31,
+      "learning_rate": 0.08,
+      "min_child_samples": 20,
+      "trees": 57,
+      "validationPrAuc": 0.7098138877981734
+    },
+    {
+      "num_leaves": 31,
+      "learning_rate": 0.08,
+      "min_child_samples": 60,
+      "trees": 56,
+      "validationPrAuc": 0.7024572020182526
+    }
+  ],
+  "chosenParameters": {
+    "colsample_bytree": 0.8,
+    "learning_rate": 0.08,
+    "min_child_samples": 20,
+    "num_leaves": 15,
+    "reg_lambda": 1.0,
+    "subsample": 0.8,
+    "trees": 139
+  },
+  "errorsByProduct": [
+    {
+      "product": "Brownie de chocolate",
+      "expired": 114,
+      "rule_false_negative": 51,
+      "model_false_negative": 13,
+      "rule_false_positive": 54,
+      "model_false_positive": 125
+    },
+    {
+      "product": "Crema de leche 1 L",
+      "expired": 88,
+      "rule_false_negative": 28,
+      "model_false_negative": 26,
+      "rule_false_positive": 34,
+      "model_false_positive": 92
+    },
+    {
+      "product": "Croissant bandeja x12",
+      "expired": 267,
+      "rule_false_negative": 58,
+      "model_false_negative": 14,
+      "rule_false_positive": 86,
+      "model_false_positive": 195
+    },
+    {
+      "product": "Galletas de mantequilla",
+      "expired": 120,
+      "rule_false_negative": 45,
+      "model_false_negative": 20,
+      "rule_false_positive": 92,
+      "model_false_positive": 180
+    },
+    {
+      "product": "Huevo maple x30",
+      "expired": 18,
+      "rule_false_negative": 9,
+      "model_false_negative": 5,
+      "rule_false_positive": 24,
+      "model_false_positive": 23
+    },
+    {
+      "product": "Jamon El Tejar 1 kg",
+      "expired": 0,
+      "rule_false_negative": 0,
+      "model_false_negative": 0,
+      "rule_false_positive": 6,
+      "model_false_positive": 0
+    },
+    {
+      "product": "Leche Pil 1 L",
+      "expired": 0,
+      "rule_false_negative": 0,
+      "model_false_negative": 0,
+      "rule_false_positive": 15,
+      "model_false_positive": 0
+    },
+    {
+      "product": "Leche Prolac 1 L",
+      "expired": 0,
+      "rule_false_negative": 0,
+      "model_false_negative": 0,
+      "rule_false_positive": 77,
+      "model_false_positive": 1
+    },
+    {
+      "product": "Naranja malla x20",
+      "expired": 0,
+      "rule_false_negative": 0,
+      "model_false_negative": 0,
+      "rule_false_positive": 0,
+      "model_false_positive": 2
+    },
+    {
+      "product": "Pan de molde bolsa 500 g",
+      "expired": 16,
+      "rule_false_negative": 14,
+      "model_false_negative": 10,
+      "rule_false_positive": 4,
+      "model_false_positive": 9
+    },
+    {
+      "product": "Queso criollo 1 kg",
+      "expired": 0,
+      "rule_false_negative": 0,
+      "model_false_negative": 0,
+      "rule_false_positive": 0,
+      "model_false_positive": 0
+    },
+    {
+      "product": "Tomate 1 kg",
+      "expired": 198,
+      "rule_false_negative": 73,
+      "model_false_negative": 16,
+      "rule_false_positive": 82,
+      "model_false_positive": 174
+    }
+  ],
+  "errorsByDays": [
+    {
+      "days_band": "(-1, 0]",
+      "expired": 159,
+      "rule_false_negative": 22,
+      "model_false_negative": 7,
+      "rule_false_positive": 36,
+      "model_false_positive": 59
+    },
+    {
+      "days_band": "(0, 1]",
+      "expired": 159,
+      "rule_false_negative": 36,
+      "model_false_negative": 9,
+      "rule_false_positive": 43,
+      "model_false_positive": 113
+    },
+    {
+      "days_band": "(1, 3]",
+      "expired": 229,
+      "rule_false_negative": 83,
+      "model_false_negative": 22,
+      "rule_false_positive": 102,
+      "model_false_positive": 230
+    },
+    {
+      "days_band": "(3, 7]",
+      "expired": 229,
+      "rule_false_negative": 108,
+      "model_false_negative": 43,
+      "rule_false_positive": 213,
+      "model_false_positive": 337
+    },
+    {
+      "days_band": "(7, 30]",
+      "expired": 45,
+      "rule_false_negative": 29,
+      "model_false_negative": 23,
+      "rule_false_positive": 80,
+      "model_false_positive": 62
+    }
+  ],
+  "missing": {
+    "usage_7d": 0.003085848299697587,
+    "usage_28d": 0.014102326729617972
+  },
+  "rowsOutsidePartitions": 975
+}

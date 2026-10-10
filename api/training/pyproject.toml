@@ -1,0 +1,11 @@
+[tool.ruff]
+line-length = 140
+src = ["src"]
+
+[tool.ruff.lint]
+# Pyflakes, pycodestyle, import order, bugbear, naming and simplifications.
+select = ["F", "E", "W", "I", "B", "N", "SIM", "UP"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

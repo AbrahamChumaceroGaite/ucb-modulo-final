@@ -1,0 +1,86 @@
+[
+  {
+    "product_id":"bada4a69-b4b5-4508-ae28-9464895b5c2c",
+    "name":"Brownie de chocolate",
+    "median_shelf_life_days":5.0,
+    "family":"bakery",
+    "unit":"und"
+  },
+  {
+    "product_id":"2f2509a3-5c12-4998-98f2-cf1e7c7f490e",
+    "name":"Crema de leche 1 L",
+    "median_shelf_life_days":12.0,
+    "family":"dairy",
+    "unit":"ml"
+  },
+  {
+    "product_id":"54a648ee-439c-4e77-889e-a6d94c56de0b",
+    "name":"Croissant bandeja x12",
+    "median_shelf_life_days":2.0,
+    "family":"bakery",
+    "unit":"und"
+  },
+  {
+    "product_id":"8e432348-4d75-410a-9f54-847a57dcc74f",
+    "name":"Galletas de mantequilla",
+    "median_shelf_life_days":7.0,
+    "family":"bakery",
+    "unit":"und"
+  },
+  {
+    "product_id":"0dfc6b3b-816e-492a-a8a0-a116a7bad227",
+    "name":"Huevo maple x30",
+    "median_shelf_life_days":21.0,
+    "family":"eggs",
+    "unit":"und"
+  },
+  {
+    "product_id":"02f02aeb-fe76-496d-9319-8aa953ac9518",
+    "name":"Jamon El Tejar 1 kg",
+    "median_shelf_life_days":15.0,
+    "family":"cold_cuts",
+    "unit":"g"
+  },
+  {
+    "product_id":"7018661a-6043-418a-9fe4-88d5ea08c753",
+    "name":"Leche Pil 1 L",
+    "median_shelf_life_days":9.0,
+    "family":"dairy",
+    "unit":"ml"
+  },
+  {
+    "product_id":"7f692920-d827-41f5-bfa4-ef74b5276857",
+    "name":"Leche Prolac 1 L",
+    "median_shelf_life_days":8.0,
+    "family":"dairy",
+    "unit":"ml"
+  },
+  {
+    "product_id":"ae7c2ad1-1e0d-49d2-a1ba-a8b7b8a54e42",
+    "name":"Naranja malla x20",
+    "median_shelf_life_days":10.0,
+    "family":"produce",
+    "unit":"und"
+  },
+  {
+    "product_id":"de08648e-b0b5-4cf0-94eb-b20fc3a0a6b3",
+    "name":"Pan de molde bolsa 500 g",
+    "median_shelf_life_days":5.0,
+    "family":"bakery",
+    "unit":"g"
+  },
+  {
+    "product_id":"44e6bcf8-9d1e-42df-a79c-2ccf99e2c365",
+    "name":"Queso criollo 1 kg",
+    "median_shelf_life_days":20.0,
+    "family":"dairy",
+    "unit":"g"
+  },
+  {
+    "product_id":"fa57601c-8e6f-4779-8468-bdc04b2c4f6e",
+    "name":"Tomate 1 kg",
+    "median_shelf_life_days":7.0,
+    "family":"produce",
+    "unit":"g"
+  }
+]
